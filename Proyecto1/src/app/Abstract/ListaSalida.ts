@@ -1,0 +1,1 @@
+export let listaSalida : Array<string> = new Array<string>();
