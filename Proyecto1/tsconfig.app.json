@@ -15,6 +15,8 @@
     "src/app/Symbol/**/*.ts",
     "src/app/Error/**/*.ts",
     "src/app/Expression/**/*.ts",
-    "src/app/Instruction/**/*.ts"
+    "src/app/Instruction/**/*.ts",
+    "src/app/Traduccion/**/*.ts",
+    "src/app/AST/**/*.ts"
   ]
 }

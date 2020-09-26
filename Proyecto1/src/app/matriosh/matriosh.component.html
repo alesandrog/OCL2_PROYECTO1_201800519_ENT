@@ -6,9 +6,10 @@
             Acciones
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <button class="dropdown-item" type="button" (click)="ejecutar()">Traducir</button>
-            <button class="dropdown-item" type="button">Ejecutar</button>
-            <button class="dropdown-item" type="button">Limpiar</button>
+            <button class="dropdown-item" type="button" (click)="traducir()">Traducir</button>
+            <button class="dropdown-item" type="button" (click)="ejecutar()">Ejecutar</button>
+            <button class="dropdown-item" type="button" (click)="generarAst()">Generar AST</button>
+            <button class="dropdown-item" type="button" (click)="limpiar()">Limpiar</button>
           </div>
         </div>
       </div>
@@ -19,7 +20,7 @@
         <h4>Editor</h4>    
       </div>
       <div class="col-6 ">
-        <h4>Salida de Traduccion</h4>    
+        <h4>Output</h4>    
       </div>
     </div>      
 
@@ -29,49 +30,25 @@
         <div class="input_editor" #inputEditor style="height: 100%; width: 100%;"></div>
       </div>
       <div class="col-6 ">
-        <div class="output_editor" #outputEditor style="height: 100%; width: 100%;"></div>
-      </div>
-    </div>
-
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-12 ">
-        <h5 >Output</h5>          
-      </div>
-    </div>
-
-
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-12 " style="height: 300px;">
         <div class="consola" #consola style="height: 100%; width: 100%;"></div>
       </div>
     </div>
 
-
     <div class="row" style="padding-top: 2%;">        
-      <div class="col-8 " >
-        <h4>Reporte de Errores</h4>    
+      <div class="col-6 ">
+        <h5 >Salida Traduccion</h5>          
       </div>
-      <div class="col-4 ">
+      <div class="col-6 ">
         <h4>Tabla de Simbolos</h4>    
       </div>
-    </div>      
+    </div>
 
-    <div class="row" style="padding-top: 2%;">
-      <div class="col-8 " style="height: 300px;">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col" style="width: 80%;">Mensaje</th>
-              <th scope="col">Linea</th>
-              <th scope="col">Columna</th>
-            </tr>
-          </thead>
-          <tbody>
 
-          </tbody>
-        </table>
+    <div class="row" style="padding-top: 2%;">        
+      <div class="col-6 " style="height: 300px;">
+        <div class="output_editor" #outputEditor style="height: 100%; width: 100%;"></div>
       </div>
-      <div class="col-4 " style="height: 300px;">
+      <div class="col-6 table-responsive overflow-auto" style="height: 300px !important;">
         <table class="table">
           <thead>
             <tr>
@@ -80,10 +57,42 @@
               <th scope="col">Entorno</th>
             </tr>
           </thead>
-          <tbody>
-
+          <tbody *ngFor="let smb of tablaSimbolos">
+            <tr>
+              <td>{{ smb.id }}</td>
+              <td>{{ smb.tipo }}</td>
+              <td>{{ smb.idEntorno }}</td>              
+            </tr>            
           </tbody>
         </table>
-      </div>        
+      </div>    
+    </div>
+
+
+    <div class="row" style="padding-top: 2%;">        
+      <div class="col-12 " >
+        <h4>Reporte de Errores</h4>    
+      </div>
+    </div>      
+
+    <div class="row" style="padding-top: 2%;">
+      <div class="col-12 " style="height: 300px;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 80%;">Mensaje</th>
+              <th scope="col">Linea</th>
+              <th scope="col">Columna</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let error of salidaErrores">
+            <tr>
+              <td>{{ error.tipo }} : {{ error.mensaje }}</td>
+              <td>{{ error.linea }}</td>
+              <td>{{ error.columna }}</td>              
+            </tr>
+          </tbody>
+        </table>
+      </div>    
     </div>
   </div>

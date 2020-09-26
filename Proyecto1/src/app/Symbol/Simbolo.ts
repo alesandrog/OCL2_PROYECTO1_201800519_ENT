@@ -5,6 +5,7 @@ export class Simbolo{
     public id : string;
     public tipo : Tipo | number;
     public variable : boolean;
+    public idEntorno : string;
 
     constructor(valor: any, id: string, tipo: Tipo, variable : boolean){
         this.valor = valor;

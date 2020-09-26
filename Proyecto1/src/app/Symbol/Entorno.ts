@@ -10,11 +10,12 @@ export class Entorno{
     
     public variables : Map<string, Simbolo>;
     public tiposUsuario : Map<string, Simbolo>;
-    private funciones : Map<string , Funcion>;
+    public funciones : Map<string , Funcion>;
     public cantidadCiclos : number;
     public cantidadFunciones : number;
     public indiceTipos : number;
     public typeTemporal : string = "";
+    public idEntorno : string = "";
     //map de funciones
 
     constructor(public anterior : Entorno | null){

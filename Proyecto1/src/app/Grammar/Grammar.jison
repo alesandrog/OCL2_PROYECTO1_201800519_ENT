@@ -361,12 +361,6 @@ masCorchetes
 corcheteFinal
     : '[' corcheteFinal ']'
     {
-/*        if($2 == null){
-         $$ = new Arreglo2(null, @1.first_line, @1.first_column);
-        }else{
-        let arrf = [$2]; 
-         $$ = new Arreglo2(arrf, @1.first_line, @1.first_column);             
-        }*/
         let arrf = [$2]; 
          $$ = new Arreglo2(arrf, @1.first_line, @1.first_column);             
     }

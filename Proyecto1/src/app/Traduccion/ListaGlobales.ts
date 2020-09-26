@@ -1,0 +1,1 @@
+export let ListaGlobales : Array<string> = new Array();

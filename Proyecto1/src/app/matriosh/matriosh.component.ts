@@ -1,15 +1,26 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+
+/* imports ejecucion ------------------------------------------ */
 import { Entorno } from "../Symbol/Entorno";
 import { errores } from '../Error/Errores';
 import { Error_ } from "../Error/Error";
 import { Funcion } from "../Instruction/Funcion";
 import { Instruction } from "../Abstract/Instruccion";
 import { listaSalida } from "../Abstract/ListaSalida";
-//import { LlamadaFuncion } from "../../archivos/Instruction/LLamadaFuncion";
 
 import * as ace from 'ace-builds';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-github';
+import { Simbolo } from '../Symbol/Simbolo';
+import { Graficar } from '../Instruction/Graficar';
+import { salidaSimbolos } from '../Symbol/SalidaTablas';
+
+
+/* imports traduccion -------------------------------------------- */
+import { FuncionT } from "../Traduccion/Instruccion/Funcion";
+//import { MapAccesos, MapEntornos, MapTraducidos } from "./MapsGlobales";
+import { EntornoT } from "../Traduccion/Symbol/Entorno";
+import { MapAccesos, MapTraducidos } from '../Traduccion/MapsGlobales';
 
 
 const THEME = 'ace/theme/github'; 
@@ -29,6 +40,8 @@ export class MatrioshComponent implements OnInit {
   private inputEditor: ace.Ace.Editor;
   private outputEditor: ace.Ace.Editor;
   private consolaEditor: ace.Ace.Editor;
+  public salidaErrores : Error_[];
+  public tablaSimbolos : Simbolo[];
 
   constructor() { }
 
@@ -36,7 +49,7 @@ export class MatrioshComponent implements OnInit {
       const element = this.inputEditorElmRef.nativeElement;
       const element2 = this.outputEditorElmRef.nativeElement;
       const element3 = this.consolaEditorElmRef.nativeElement;
-
+      this.salidaErrores = [];
       const editorOptions: Partial<ace.Ace.EditorOptions> = {
           highlightActiveLine: true,
           minLines: 15,
@@ -60,15 +73,25 @@ export class MatrioshComponent implements OnInit {
 
     }
 
-
+      //TODO while a un arreglo se buggeo
       ejecutar(){
+        
+        while(errores.length > 0){
+          errores.pop();
+        }
+
+        while(listaSalida.length > 0){
+          listaSalida.pop();
+        }
+
       try{
         const parser = require('../Grammar/Grammar');
        // const fs = require('fs');
-        const entrada = `console.log("piola");`;      
+        const entrada = this.inputEditor.getValue();      
 //        const entrada = fs.readFileSync('./entrada.ts');
         const ast = parser.parse(entrada.toString());
         const env = new Entorno(null);
+        env.idEntorno = "global";
     
         //primera pasada
         for(const instr of ast){
@@ -91,9 +114,16 @@ export class MatrioshComponent implements OnInit {
                 continue;
             try {
                 if(instr instanceof Instruction){
-                    const actual = instr.execute(env);
-                    if(actual != null || actual != undefined){
-                        errores.push(new Error_(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
+                    if(instr instanceof Graficar){
+                        const actual = instr.execute(env);
+                        this.tablaSimbolos = salidaSimbolos;
+                        console.log(salidaSimbolos);
+//                        salidaSimbolos.clear;
+                    }else{
+                        const actual = instr.execute(env);
+                        if(actual != null || actual != undefined){
+                            errores.push(new Error_(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
+                        }
                     }
                 }else{
                     errores.push(instr);
@@ -109,6 +139,68 @@ export class MatrioshComponent implements OnInit {
     
     
     console.log(errores);
-    console.log(listaSalida); 
-    }
+    console.log(listaSalida);
+    let out = "";
+    this.consolaEditor.setValue(" " , 0);
+    for(const val of listaSalida){
+      out += val + "\n";
+    } 
+    this.consolaEditor.setValue(out , 0);
+    this.salidaErrores = errores;
+    };
+
+
+    traducir(){
+        while(errores.length > 0){
+            errores.pop();
+          }
+  
+          while(listaSalida.length > 0){
+            listaSalida.pop();
+          }        
+        try{
+            const parser = require('../Traduccion/Grammar/Grammar');
+            const entrada = this.inputEditor.getValue();      
+            const ast = parser.parse(entrada.toString());
+            const env = new EntornoT(null);
+    
+    
+            for(const instr of ast){
+                console.log(instr);
+                if(instr instanceof FuncionT){
+                    instr.llenarMapas(env);
+                }else{
+                    continue;
+                }
+            }
+            let salida = "";
+            for(const instr of ast){
+                //console.log(instr);
+                salida += instr.traducir(env) + "\n";
+            }
+            
+            console.log(MapAccesos);
+            console.log(MapTraducidos); 
+            this.outputEditor.setValue("");
+            this.outputEditor.setValue(salida);
+            this.salidaErrores = errores;    
+            console.log(errores); 
+        }catch(error){ errores.push(error)};
+          
+    };
+
+    limpiar(){
+        this.inputEditor.setValue("");
+        this.outputEditor.setValue("");
+        this.consolaEditor.setValue("");
+    };
+
+    generarAst(){
+        const parser = require('../AST/Grammar');
+        const entrada = this.inputEditor.getValue();
+ //       const entrada = "let a = a; let b = b;";
+        const ast = parser.parse(entrada.toString());
+       // console.log(ast);
+    };
+    
 }
