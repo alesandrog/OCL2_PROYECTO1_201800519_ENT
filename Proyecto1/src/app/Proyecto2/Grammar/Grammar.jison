@@ -32,6 +32,8 @@
     //Relacionales
     const { Mayor } = require('../Expresion/Relacional/Mayor');
     const { Menor } = require('../Expresion/Relacional/Menor');
+    const { Igual } = require('../Expresion/Relacional/Igual');    
+    const { Dif } = require('../Expresion/Relacional/Dif');        
 
     /*=====================================INSTRUCCION==============================================*/
 
@@ -720,11 +722,11 @@ Expr
     }
     | Expr '==' Expr
     {
-
+        $$ = new Igual($1, $3, @1.first_line, @1.first_column);
     }
     | Expr '!=' Expr
     {
-
+        $$ = new Dif($1, $3, @1.first_line, @1.first_column);
     }
     | Expr '&&' Expr
     {
