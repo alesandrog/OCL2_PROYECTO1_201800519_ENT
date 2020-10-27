@@ -24,6 +24,10 @@
     const { Modulo} = require('../Expresion/Aritmetica/Modulo');
     
     //Logicas
+    
+    const { And } = require('../Expresion/Logica/And');
+    const { Or } = require('../Expresion/Logica/Or');
+    const { Not } = require('../Expresion/Logica/Not');    
 
     //Relacionales
     const { Mayor } = require('../Expresion/Relacional/Mayor');
@@ -724,15 +728,15 @@ Expr
     }
     | Expr '&&' Expr
     {
-
+        $$ = new And($1, $3, @1.first_line, @1.first_column);
     }
     | Expr '||' Expr
     {
-
+        $$ = new Or($1, $3, @1.first_line, @1.first_column);
     }
     | '!' Expr
     {
-
+        $$ = new Not($2, @1.first_line, @1.first_column);
     }            
     | F
     {
