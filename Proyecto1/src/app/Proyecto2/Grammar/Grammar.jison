@@ -39,6 +39,11 @@
 
     const { Declaracion } = require('../Instruccion/Variables/Declaracion');
     const { Asignacion } = require('../Instruccion/Variables/Asignacion');    
+
+
+    // Sentencias de Control
+    const { If } = require('../Instruccion/SentenciasControl/If');
+    const { While } = require('../Instruccion/SentenciasControl/While');        
  
 
     /*MANEJO DE TYPES-------------------------------------------------------*/
@@ -461,7 +466,7 @@ Length
 If
     : 'IF' '(' Expr ')' BloqueInstrucciones Else
     {
-
+        $$ = new If($3, $5, $6, @1.first_line, @1.first_column);
     }
 ;
 
@@ -483,7 +488,7 @@ Else
 While
     : 'WHILE' '(' Expr ')' BloqueInstrucciones
     {
-
+        $$ = new While($3, $5, @1.first_line, @1.first_column);
     }
 ;
 
@@ -608,11 +613,11 @@ declaracion_for
 BloqueInstrucciones
     : '{'  Instrucciones '}'
     {
-
+        $$ = $2;
     } 
     | '{' '}'
     {
-        $$ = null;
+        $$ = [];
     }
   ; 
 
