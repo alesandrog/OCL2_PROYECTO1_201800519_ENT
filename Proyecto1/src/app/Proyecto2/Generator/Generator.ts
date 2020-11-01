@@ -1,21 +1,80 @@
 import { Entorno } from "../TablaSimbolos/Entorno";
+import { FuncionesNativas } from './FuncionesNativas';
 
 export class Generator{
     private static generator: Generator;
-    private temporal : number;
-    private label : number;
+    private temporal : number; //Contador de temporales
+    private label : number;    //Contador de etiquetas
     private code : string[];
-    private tempStorage : Set<string>;
+    private funciones : string[];
+    private declaracionesMetodos : string[];
+    private tempStorage : Set<string>; //Temporales no utilizaods
     isFunc = '';
 
     private constructor(){
         this.temporal = this.label = 0;
         this.code = new Array();
+        this.funciones = new Array();
+        this.declaracionesMetodos = new Array();
         this.tempStorage = new Set();
     }
 
+
+
     public static getInstance(){
         return this.generator || (this.generator = new this());
+    }
+
+
+    public header() : string{
+        return `#include <stdio.h>\ndouble Heap[16384];\ndouble Stack[16394];\nint p;\nint h;\n\n\n`;
+    }
+
+    public printMain() : string{
+        let mainOut = this.printTemporales();
+        mainOut += this.declaracionesMetodos.join('\n')+"\n\n";
+         mainOut += `void main(){\n`;
+        for(let i = 0; i < this.code.length; i++){
+            if(this.code[i] != "INICIO METODO"){
+                mainOut += this.code[i] + '\n';
+            }else{
+                i++;
+                while(this.code[i]!="FIN METODO"){
+                    this.funciones.push(this.code[i]);
+                    i++;
+                }
+            }
+        }
+        mainOut += '}\n\n\n';
+
+        mainOut += '\n' + this.funciones.join('\n');
+        return mainOut;
+    }
+
+    public printTemporales() : string{
+        let res = "double ";
+        for(let i = 0; i < this.temporal-1; i++){
+            res += `T${i},`;
+        }
+        res += `T${this.temporal-1};\n`;
+        return res;
+    }
+
+    public inicioMetodo(){
+        this.code.push("INICIO METODO");
+    }
+
+    public finMetodo(){
+        this.code.push("FIN METODO");
+    }
+
+    public nombreMetodo(id:string){
+        this.code.push(`void ${id}(){`);
+        this.declaracionesMetodos.push(`void ${id}();`);
+    }
+
+    public returnMetodo(){
+        this.code.push("return;\n}");
     }
 
     public getTempStorage(){
@@ -50,6 +109,10 @@ export class Generator{
         return temp;
     }
 
+    public llamadaFuncion(id:string){
+        this.code.push(`${id}();`);        
+    }
+
     public newLabel() : string{
         return 'L' + this.label++;
     }
@@ -75,19 +138,19 @@ export class Generator{
     }
 
     public addGetHeap(target : any, index: any){
-        this.code.push(`${this.isFunc}${target} = Heap[${index}];`);
+        this.code.push(`${this.isFunc}${target} = Heap[(int)${index}];`);
     }
 
     public addSetHeap(index: any, value : any){
-        this.code.push(`${this.isFunc}Heap[${index}] = ${value};`);
+        this.code.push(`${this.isFunc}Heap[(int)${index}] = ${value};`);
     }
     
     public addGetStack(target : any, index: any){
-        this.code.push(`${this.isFunc}${target} = Stack[${index}];`);
+        this.code.push(`${this.isFunc}${target} = Stack[(int)${index}];`);
     }
 
     public addSetStack(index: any, value : any){
-        this.code.push(`${this.isFunc}Stack[${index}] = ${value};`);
+        this.code.push(`${this.isFunc}Stack[(int)${index}] = ${value};`);
     }
 
     public addNextEnv(size: number){
@@ -98,17 +161,6 @@ export class Generator{
         this.code.push(`${this.isFunc}p = p - ${size};`);
     }
 
-    public addCall(id: string){
-        this.code.push(`${this.isFunc}call ${id};`);
-    }
-
-    public addBegin(id: string){
-        this.code.push(`\nproc ${id} begin`);
-    }
-
-    public addEnd(){
-        this.code.push('end\n');
-    }
 
     public addPrint(format: string, value: any){
         this.code.push(`${this.isFunc}print("%${format}",${value});`);
