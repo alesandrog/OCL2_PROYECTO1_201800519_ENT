@@ -17,26 +17,34 @@ export class Mas extends Expresion {
 
     public compile(env: Entorno): Retorno {
         const left = this.left.compile(env);
-        const right = this.right.compile(env);
         const generator = Generator.getInstance();
-        const temp = generator.newTemporal();
+        const right = this.right.compile(env);
+        const temp = generator.newTemporal();         
         switch (left.type.type) {
             case Tipos.NUMBER:
+               
                 switch (right.type.type) {
                     case Tipos.NUMBER:
                         generator.addExpression(temp, left.getValue(), right.getValue(), '+');
                         return new Retorno(temp, true, right.type.type == Tipos.NUMBER ? right.type : left.type);
-               /*     case Tipos.STRING:
-                        const tempAux = generator.newTemporal(); generator.freeTemp(tempAux);
+                    case Tipos.STRING:
+                        const tempAux = generator.newTemporal(); 
+                        generator.freeTemp(tempAux);
+                        // Paso de parametro operador izquierdo
                         generator.addExpression(tempAux,'p',env.size + 1, '+');
                         generator.addSetStack(tempAux,left.getValue());
+                        // Paso de parametro operador derecho
                         generator.addExpression(tempAux,tempAux,'1','+');
                         generator.addSetStack(tempAux,right.getValue());
-                        generator.addNextEnv(env.size);
-                        generator.addCall('native_concat_int_str');
-                        generator.addGetStack(temp,'p');
-                        generator.addAntEnv(env.size);
-                        return new Retorno(temp, true, new Tipo(Tipos.STRING));*/
+                        // Cambio de ambito                        
+                        generator.addNextEnv(env.size + 1);
+                        generator.llamadaFuncion('concat_number_str');
+                        // Obtener retorno
+                        const retorno_str_number = generator.newTemporal();
+                        generator.addExpression(retorno_str_number, 'p', '2', '+');
+                        generator.addGetStack(temp,retorno_str_number);
+                        generator.addAntEnv(env.size+1);
+                        return new Retorno(temp, true, new Tipo(Tipos.STRING));
                     default:
                         break;
                 }
@@ -106,28 +114,39 @@ export class Mas extends Expresion {
                     default:
                         break;
                 }
-        /*    case Tipos.BOOLEAN:
+            case Tipos.BOOLEAN:                            
                 switch (right.type.type) {
                     case Tipos.STRING:
-                        const tempAux = generator.newTemporal(); generator.freeTemp(tempAux);
+                        const tempAux = generator.newTemporal(); 
+                        generator.freeTemp(tempAux);
                         const lblTemp = generator.newLabel();
-                        generator.addExpression(tempAux,'p',env.size + 1, '+');
+
+
                         generator.addLabel(left.trueLabel);
-                        generator.addSetStack(tempAux,'1');
-                        generator.addGoto(lblTemp);
-                        generator.addLabel(left.falseLabel);
-                        generator.addSetStack(tempAux,'0');
-                        generator.addLabel(lblTemp);
-                        generator.addExpression(tempAux,tempAux,'1','+');
+                        generator.addExpression(tempAux,'p',env.size + 1, '+');
+                        generator.addSetStack(tempAux,'1');                        
+                        generator.addExpression(tempAux,tempAux,'1','+');                        
                         generator.addSetStack(tempAux,right.getValue());
-                        generator.addNextEnv(env.size);
-                        generator.addCall('native_concat_bol_str');
-                        generator.addGetStack(temp,'p');
-                        generator.addAntEnv(env.size);
+                        generator.addGoto(lblTemp);
+
+                        generator.addLabel(left.falseLabel);
+                        generator.addExpression(tempAux,'p',env.size + 1, '+');
+                        generator.addSetStack(tempAux,'0');
+                        generator.addExpression(tempAux,tempAux,'1','+');                        
+                        generator.addSetStack(tempAux,right.getValue());
+
+                        generator.addLabel(lblTemp);
+
+                        generator.addNextEnv(env.size + 1);
+                        generator.llamadaFuncion('concat_bool_str');
+                        const tempRetBool = generator.newTemporal();                        
+                        generator.addExpression(tempRetBool, 'p', '2', '+');
+                        generator.addGetStack(temp,tempRetBool);
+                        generator.addAntEnv(env.size + 1);
                         return new Retorno(temp, true, new Tipo(Tipos.STRING));
                     default:
                         break;
-                }*/
+                }
         }
  //       throw new Error(this.line, this.column, 'Semantico', `No se puede sumar ${left.type.type} + ${right.type.type}`);
     }

@@ -378,14 +378,14 @@ export class FuncionesNativas{
 void number_to_string(){
 int param1 = p + 0;    
 int iterador = 0;
-int asciiNumero;    
+int asciiNumero = 0;    
 char ascii;
 int bandera = 0;        
 double numero = Stack[param1];
 double copia = numero;
 int copia2 = (int)copia;
 double verificacion = numero - copia2;
-double vdecimales;
+double vdecimales = 0;
 if(verificacion == 0 ) goto CONTINUAR2;
 if(copia < 0) goto NEGAR;
 vdecimales = verificacion;
@@ -544,11 +544,183 @@ return;
         const tempRet = generator.newTemporal();
         generator.addExpression(tempRet, 'p', '2', '+');
         generator.addSetStack(tempRet, heapActual);
-        
+
         generator.returnMetodo();        
         generator.finMetodo();     
     }
 
+    public concat_int_str(){
+        const generator = Generator.getInstance();
+
+        generator.inicioMetodo();   
+        generator.nombreMetodo("concat_number_str");     
+
+
+        // Temporal para acceder al primer parametro (pos. inicial string)
+        const param1 = generator.newTemporal();
+        generator.addExpression(param1, 'p', '0', '+');
+        // Acceder y guardar el valor
+        const valorEntero = generator.newTemporal();
+        generator.addGetStack(valorEntero, param1);
+        
+        // Posicion inicial del entero
+        const param2 = generator.newTemporal();
+        generator.addExpression(param2, 'p', '1', '+');
+        // Acceder y guardar el valor
+        const punteroHeap = generator.newTemporal();
+        generator.addGetStack(punteroHeap, param2);
+
+
+        // Almacenar el puntero a heap antes de inicial
+        const heapActual = generator.newTemporal();
+        generator.addExpression(heapActual, 'h');
+    
+        // Generar temporal para guardar el acceso a heap para primer string
+        const accesoHeap = generator.newTemporal();
+
+    
+        // Etiqueta para escribir primer string
+        const lblStr1 = generator.newLabel();
+        // Etiqueta de salida
+        const lblExit = generator.newLabel();
+
+        /* Conversion de numero a string */
+        // Cambio de ambito
+        generator.addNextEnv(3);
+        const tempParam = generator.newTemporal();
+        // Pasar como parametro el numero a concatenar
+        generator.addExpression(tempParam , 'p');
+        generator.addSetStack(tempParam, valorEntero);
+        generator.llamadaFuncion("number_to_string");
+//        generator.addSetHeap('h', valorEntero);
+//        generator.nextHeap();
+        generator.addAntEnv(3);
+
+
+
+        // Primera comparacion
+        generator.addLabel(lblStr1);
+        // Obtener el valor de heap
+        generator.addGetHeap(accesoHeap, punteroHeap);        
+        // Comparar si es fin de cadena
+        generator.addIf(accesoHeap, '-1', '==', lblExit);
+        // Ejecutar loop 1
+        generator.addSetHeap('h', accesoHeap);
+        generator.nextHeap();
+        generator.addExpression(punteroHeap, punteroHeap, '1', '+');
+        generator.addGoto(lblStr1);
+
+        // Imprimir salida        
+        generator.addLabel(lblExit);
+        generator.addSetHeap('h', -1);
+        generator.nextHeap();
+
+        const tempRet = generator.newTemporal();
+        generator.addExpression(tempRet, 'p', '2', '+');
+        generator.addSetStack(tempRet, heapActual);
+
+        generator.returnMetodo();        
+        generator.finMetodo();         
+    }
+
+
+    public concat_bool_str(){
+        const generator = Generator.getInstance();
+
+        generator.inicioMetodo();   
+        generator.nombreMetodo("concat_str_bool");     
+
+        // Temporal para acceder al primer parametro (valor booleano)
+        const param1 = generator.newTemporal();
+        generator.addExpression(param1, 'p', '0', '+');
+        // Acceder y guardar el valor
+        const valorBool = generator.newTemporal();
+        generator.addGetStack(valorBool, param1);
+
+        // Posicion inicial del segundo string
+        const param2 = generator.newTemporal();
+        generator.addExpression(param2, 'p', '1', '+');
+        // Acceder y guardar el valor
+        const punteroHeap = generator.newTemporal();
+        generator.addGetStack(punteroHeap, param2);
+
+
+
+        // Almacenar el puntero a heap antes de inicial
+        const heapActual = generator.newTemporal();
+        generator.addExpression(heapActual, 'h');
+
+        // Generar temporal para guardar el acceso a heap para primer string
+        const accesoHeap = generator.newTemporal();
+
+        // Etiqueta para escribir primer string
+        const lblStr1 = generator.newLabel();
+        // Etiqueta para escribir segundo string
+        const lblTrue = generator.newLabel();
+        // Etiqueta para escribir segundo string
+        const lblFalse = generator.newLabel();                
+        // Etiqueta de salida
+        const lblExit = generator.newLabel();
+
+
+        // Escribir booleano 
+        generator.addLabel(lblTrue);
+
+        generator.addIf(valorBool, '0', '==', lblFalse);
+        // Comparar si es fin de cadena
+        generator.addSetHeap('h', 116); // t
+        generator.nextHeap();
+        generator.addSetHeap('h', 114); // r
+        generator.nextHeap();
+        generator.addSetHeap('h', 117); // u
+        generator.nextHeap();
+        generator.addSetHeap('h', 101); // e
+        generator.nextHeap();
+        generator.addGoto(lblExit);
+
+
+        generator.addLabel(lblFalse);
+
+        // Comparar si es fin de cadena
+        generator.addSetHeap('h', 102); // f
+        generator.nextHeap();
+        generator.addSetHeap('h', 97); // a
+        generator.nextHeap();
+        generator.addSetHeap('h', 108); // l
+        generator.nextHeap();
+        generator.addSetHeap('h', 115); // s
+        generator.nextHeap();
+        generator.addSetHeap('h', 101); // e
+        generator.nextHeap();        
+
+
+
+        // Primera comparacion
+        generator.addLabel(lblStr1);
+        // Obtener el valor de heap
+        generator.addGetHeap(accesoHeap, punteroHeap);        
+        // Comparar si es fin de cadena
+        generator.addIf(accesoHeap, '-1', '==', lblExit);
+        // Ejecutar loop 1
+        generator.addSetHeap('h', accesoHeap);
+        generator.nextHeap();
+        generator.addExpression(punteroHeap, punteroHeap, '1', '+');
+        generator.addGoto(lblStr1);
+
+
+        // Imprimir salida        
+        generator.addLabel(lblExit);          
+
+        // Guardar retorno
+        generator.addSetHeap('h', -1);
+        generator.nextHeap();
+        const tempRet = generator.newTemporal();
+        generator.addExpression(tempRet, 'p', '2', '+');
+        generator.addSetStack(tempRet, heapActual);
+
+        generator.returnMetodo();        
+        generator.finMetodo();            
+    }
 
 }
 
