@@ -16,7 +16,6 @@ export class While extends Instruccion {
     }
 
     compile(env: Entorno): void {
-        //TODO break y continue  
         const generator = Generator.getInstance();
         const newLbl = generator.newLabel();
         // Imprimir etiqueta sobre la que se hara el loop 
@@ -28,6 +27,8 @@ export class While extends Instruccion {
         if (condicion.type.type!= Tipos.BOOLEAN)
             throw new Error_(this.line,this.column,'Semantico','Condicion no booleana');
         const newEnv = new Entorno(env);
+        newEnv.break = condicion.falseLabel;
+        newEnv.continue = newLbl;
         for(let i = 0; i < this.instrucciones.length; i++){
             this.instrucciones[i].compile(newEnv);
         }

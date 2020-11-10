@@ -54,6 +54,8 @@ export class ForOf extends Instruccion {
         generator.addExpression(temp, 'p', newVar.position, '+');                
         generator.addSetStack(temp, valHeap);
         // Compilar instrucciones
+        newEnv.break = exitLbl;
+        newEnv.continue = loopLbl;        
         this.instrucciones.forEach((instr)=>{
             instr.compile(newEnv);
         });

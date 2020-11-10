@@ -59,6 +59,8 @@ export class For extends Instruccion {
         }
         generator.addIf(iterador.getValue(), limite.getValue(), op, exitLbl);
         // Compilar instrucciones
+        newEnv.break = exitLbl;
+        newEnv.continue = loopLbl;
         this.instrucciones.forEach((instr)=>{
             instr.compile(newEnv);
         });

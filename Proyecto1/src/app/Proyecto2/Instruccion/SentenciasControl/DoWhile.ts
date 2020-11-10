@@ -16,13 +16,14 @@ export class DoWhile extends Instruccion {
     }
 
     compile(env: Entorno): void {
-        //TODO break y continue  
         const generator = Generator.getInstance();
         const trueLbl = generator.newLabel();
         const falseLbl = generator.newLabel();
         // Imprimir etiqueta sobre la que se hara el loop 
         generator.addLabel(trueLbl);
         const newEnv = new Entorno(env);
+        newEnv.break = falseLbl;
+        newEnv.continue = trueLbl;
         for(let i = 0; i < this.instrucciones.length; i++){
             this.instrucciones[i].compile(newEnv);
         }        

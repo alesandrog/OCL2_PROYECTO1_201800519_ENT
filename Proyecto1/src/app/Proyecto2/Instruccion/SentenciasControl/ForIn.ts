@@ -50,6 +50,8 @@ export class ForIn extends Instruccion {
         generator.addExpression(temp, 'p', newVar.position, '+');                
         generator.addSetStack(temp, iterador);
         // Compilar instrucciones
+        newEnv.break = exitLbl;
+        newEnv.continue = loopLbl;        
         this.instrucciones.forEach((instr)=>{
             instr.compile(newEnv);
         });
