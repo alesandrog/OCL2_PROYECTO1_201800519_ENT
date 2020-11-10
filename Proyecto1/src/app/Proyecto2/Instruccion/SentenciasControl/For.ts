@@ -45,16 +45,16 @@ export class For extends Instruccion {
         let op = "";
         switch(this.operador){
             case '<':
-                op = '>';
-                break;
-            case '<=':
                 op = '>=';
                 break;
+            case '<=':
+                op = '>';
+                break;
             case '>':
-                op = '<';
+                op = '<=';
                 break;
             case '>=':
-                op = '<=';
+                op = '<';
                 break;           
         }
         generator.addIf(iterador.getValue(), limite.getValue(), op, exitLbl);
