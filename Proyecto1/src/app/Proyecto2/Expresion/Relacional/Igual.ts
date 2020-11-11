@@ -49,8 +49,8 @@ export class Igual extends Expresion{
                 }
             case Tipos.BOOLEAN:
                 // Generar etiquetas verdaderas y falsas
-                const trueLabel = generator.newLabel();
-                const falseLabel = generator.newLabel();
+                const trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
+                const falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
                 // Imprimir etiqueta verdadera op izquierdo
                 generator.addLabel(left.trueLabel);
                 this.right.trueLabel = trueLabel;

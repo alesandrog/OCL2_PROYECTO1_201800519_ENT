@@ -46,16 +46,16 @@ export class If extends Instruccion {
             // Imprimir etiqueta del salto incondicional
             generator.addLabel(newLbl);
         }else{
-            // Generar salto incondicional
+            // Generar salto incondicional           
             const newLbl = generator.newLabel();
             generator.addGoto(newLbl);
             // Imprimir etiqueta falsa del If
-            generator.addLabel(condicion.falseLabel);
+            generator.addLabel(condicion.falseLabel);             
             //Ejecutar instrucciones del else 
             const newEnv2 = new Entorno(env);
             for(let i = 0; i < this.elseSt.length; i++)
                 this.elseSt[i].compile(newEnv2);    
-            // Imprimir etiqueta del salto incondicional
+            // Imprimir etiqueta de salida
             generator.addLabel(newLbl);
         }
     }

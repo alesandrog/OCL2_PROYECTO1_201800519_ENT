@@ -23,10 +23,9 @@ export class Dif extends Expresion{
         // Ejecutar operador izquierdo
         const left = this.left.compile(env);
         let right : Retorno | null = null;
-        right = this.right.compile(env);
         switch (left.type.type) {
             case Tipos.NUMBER:
-
+                right = this.right.compile(env);
                 switch (right.type.type) {
                     case Tipos.NUMBER:
                         // Generar etiquetas verdaderas y falsas
@@ -47,8 +46,8 @@ export class Dif extends Expresion{
                 }
             case Tipos.BOOLEAN:
                 // Generar etiquetas verdaderas y falsas
-                const trueLabel = generator.newLabel();
-                const falseLabel = generator.newLabel();
+                const trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
+                const falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
                 // Imprimir etiqueta verdadera op izquierdo
                 generator.addLabel(left.trueLabel);
                 this.right.trueLabel = falseLabel;
@@ -70,6 +69,7 @@ export class Dif extends Expresion{
                 }
                 break;
                 case Tipos.STRING:
+                    right = this.right.compile(env);
                     switch(right.type.type){
                         case Tipos.STRING:
                             // Generar etiquetas verdaderas y falsas
@@ -123,6 +123,7 @@ export class Dif extends Expresion{
 
             break;
             case Tipos.ARRAY:
+                right = this.right.compile(env);
                 switch(right.type.type){
                     case Tipos.ARRAY:
                             // Generar etiquetas verdaderas y falsas
@@ -156,6 +157,7 @@ export class Dif extends Expresion{
                 }
             break;
             case Tipos.TYPE:
+                right = this.right.compile(env);
                 switch(right.type.type){
                     case Tipos.TYPE:
                             // Generar etiquetas verdaderas y falsas
@@ -188,6 +190,7 @@ export class Dif extends Expresion{
                 }
                 break;
             case Tipos.NULL:
+                right = this.right.compile(env);
                 if(right.type.type == Tipos.NULL){
                             // Generar etiquetas verdaderas y falsas
                             this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
