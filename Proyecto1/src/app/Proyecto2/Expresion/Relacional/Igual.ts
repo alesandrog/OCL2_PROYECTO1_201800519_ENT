@@ -24,11 +24,12 @@ export class Igual extends Expresion{
         // Ejecutar operador izquierdo
         const left = this.left.compile(env);
         let right : Retorno | null = null;
-        right = this.right.compile(env);
         switch (left.type.type) {
             case Tipos.NUMBER:
+                right = this.right.compile(env);
                 switch (right.type.type) {
                     case Tipos.NUMBER:
+
                         // Generar etiquetas verdaderas y falsas
                         this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                         this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
@@ -71,9 +72,11 @@ export class Igual extends Expresion{
                 }
                 break;
             case Tipos.STRING:
-                        switch(right.type.type){
+                        right = this.right.compile(env);
+                        switch(right.type.type){                            
                             case Tipos.STRING:
-                                // Generar etiquetas verdaderas y falsas
+                                right = this.right.compile(env);
+                            // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
 
@@ -107,6 +110,7 @@ export class Igual extends Expresion{
                                 retorno.falseLabel = this.falseLabel;
                                 return retorno;
                             case Tipos.NULL:
+                                right = this.right.compile(env);
                                 // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
@@ -124,8 +128,10 @@ export class Igual extends Expresion{
 
                 break;
                 case Tipos.ARRAY:
+                    right = this.right.compile(env);
                     switch(right.type.type){
                         case Tipos.ARRAY:
+                            
                                 // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
@@ -140,6 +146,7 @@ export class Igual extends Expresion{
                                 retorno.falseLabel = this.falseLabel;
                                 return retorno;
                         case Tipos.NULL:       
+                                right = this.right.compile(env);
                                 // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
@@ -157,8 +164,10 @@ export class Igual extends Expresion{
                     }
                 break;
                 case Tipos.TYPE:
+                    right = this.right.compile(env);
                     switch(right.type.type){
                         case Tipos.TYPE:
+                                
                                 // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
@@ -172,7 +181,8 @@ export class Igual extends Expresion{
                                 retorno.trueLabel = this.trueLabel;
                                 retorno.falseLabel = this.falseLabel;
                                 return retorno;                            
-                        case Tipos.NULL:       
+                        case Tipos.NULL:    
+                                right = this.right.compile(env);   
                                 // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
@@ -192,6 +202,7 @@ export class Igual extends Expresion{
                     }
                     break;
                 case Tipos.NULL:
+                    right = this.right.compile(env);
                     if(right.type.type == Tipos.NULL){
                                 // Generar etiquetas verdaderas y falsas
                                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
