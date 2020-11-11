@@ -22,7 +22,13 @@ export class Console extends Instruccion {
             generator.addPrint('d', 'int',value.getValue());
             generator.addPrint('c', 'int',10);            
         }else if(value.type.type == Tipos.BOOLEAN){
-            
+            const templabel = generator.newLabel();
+            generator.addLabel(value.trueLabel);
+            generator.addPrintTrue();
+            generator.addGoto(templabel);
+            generator.addLabel(value.falseLabel);
+            generator.addPrintFalse();
+            generator.addLabel(templabel);            
         }else{ // string
         const tempIterador = generator.newTemporal();
         generator.addExpression(tempIterador, value.getValue());
