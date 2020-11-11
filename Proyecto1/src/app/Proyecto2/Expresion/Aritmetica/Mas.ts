@@ -125,15 +125,17 @@ export class Mas extends Expresion {
                         generator.addLabel(left.trueLabel);
                         generator.addExpression(tempAux,'p',env.size + 1, '+');
                         generator.addSetStack(tempAux,'1');                        
-                        generator.addExpression(tempAux,tempAux,'1','+');                        
-                        generator.addSetStack(tempAux,right.getValue());
+                        generator.addExpression(tempAux,tempAux,'1','+');
+                        const newRight = this.right.compile(env);                        
+                        generator.addSetStack(tempAux,newRight.getValue());
                         generator.addGoto(lblTemp);
 
                         generator.addLabel(left.falseLabel);
                         generator.addExpression(tempAux,'p',env.size + 1, '+');
                         generator.addSetStack(tempAux,'0');
                         generator.addExpression(tempAux,tempAux,'1','+');                        
-                        generator.addSetStack(tempAux,right.getValue());
+                        const newRight2 = this.right.compile(env);                        
+                        generator.addSetStack(tempAux,newRight2.getValue());
 
                         generator.addLabel(lblTemp);
 
