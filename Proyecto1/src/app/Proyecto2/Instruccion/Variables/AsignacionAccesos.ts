@@ -27,11 +27,26 @@ export class AsignacionAccesos extends Instruccion {
             throw new Error_(this.line, this.column, 'Semantico', `No existe la variable ${this.id}`);        
     
         const variable = this.accesos.compile(env);
+        console.log("EN ASIGNACION ACCESOS");
+        console.log(variable);
         const value = this.value.compile(env);
         if (!this.sameType(variable.type, value.type)) {
             throw new Error_(this.line,this.column,'Semantico',' Tipos de dato diferentes');
         }
-        if (symbol?.isGlobal) {
+
+        if (symbol.type.type == Tipos.BOOLEAN) {
+            const templabel = generator.newLabel();
+            generator.addLabel(value.trueLabel);
+            generator.addSetHeap(variable.getValue(), '1');
+            generator.addGoto(templabel);
+            generator.addLabel(value.falseLabel);
+            generator.addSetHeap(variable.getValue(), '0');
+            generator.addLabel(templabel);
+        }
+        else {
+            generator.addSetHeap(variable.getValue(), value.getValue());
+        }
+       /* if (symbol?.isGlobal) {
             if (symbol.type.type == Tipos.BOOLEAN) {
                 const templabel = generator.newLabel();
                 generator.addLabel(value.trueLabel);
@@ -51,18 +66,18 @@ export class AsignacionAccesos extends Instruccion {
                 const temp = generator.newTemporal();
                 generator.addExpression(temp, 'p', variable.getValue(), '+');                                
                 generator.addLabel(value.trueLabel);
-                generator.addSetStack(temp, '1');
+                generator.addSetHeap(temp, '1');
                 generator.addGoto(templabel);
                 generator.addLabel(value.falseLabel);
-                generator.addSetStack(temp, '0');
+                generator.addSetHeap(temp, '0');
                 generator.addLabel(templabel);
             }
             else {
                 const temp = generator.newTemporal();
                 generator.addExpression(temp, 'p', variable.getValue(), '+');                                
-                generator.addSetStack(temp, value.getValue());
+                generator.addSetHeap(temp, value.getValue());
             }
-        }
+        }*/
 
     }
 
