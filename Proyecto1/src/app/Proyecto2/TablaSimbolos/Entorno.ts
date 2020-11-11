@@ -2,26 +2,29 @@
 //import { SymbolStruct } from "./SymbolStruct";
 import { Simbolo } from "./Simbolo";
 import { Tipo, Tipos } from "../Util/Tipo";
+import { Funcion } from '../Instruccion/Funciones/Funcion';
+import { SimboloType } from './SimboloType';
+import { AtributoType } from './AtributoType';
 //import { Error } from "../Utils/Error";
 //import { FunctionSt } from "../Instruction/Functions/FunctionSt";
 //import { StructSt } from "../Instruction/Functions/StructSt";
 //import { Param } from "../Utils/Param";
 
 export class Entorno {
-//    functions: Map<string, SymbolFunction>;
-//    structs: Map<string, SymbolStruct>;
+    funciones: Map<string, Funcion>;
+    types: Map<string, SimboloType>;
     vars: Map<string, Simbolo>;
     anterior: Entorno | null;
-    size: number;
+    size: number;  // Valor relativo dentro de las funciones
     break: string | null;
     continue: string | null;
     return: string | null;
-    prop : string;
-//    actualFunc: SymbolFunction | null;
+    prop : string;  //Nombre del entorno actual
+    actualFunc: Funcion | null;
 
     constructor(anterior: Entorno | null = null) {
-//        this.functions = new Map();
-//        this.structs = new Map();
+        this.funciones = new Map();
+        this.types = new Map();
         this.vars = new Map();
         this.anterior = anterior;
         this.size = anterior?.size || 0;
@@ -29,16 +32,16 @@ export class Entorno {
         this.return = anterior?.return || null;
         this.continue = anterior?.continue || null;
         this.prop = 'main';
-  //      this.actualFunc = anterior?.actualFunc || null;
+        this.actualFunc = anterior?.actualFunc || null;
     }
-/*
-    setEnviorementFunc(prop: string, actualFunc : SymbolFunction, ret : string){
+
+    guardarMetadata(prop: string, actualFunc : Funcion, ret : string){
         this.size = 1; //1 porque la posicion 0 es para el return
         this.prop = prop;
         this.return = ret;
         this.actualFunc = actualFunc;
     }
-*/
+
     public addVar(id: string, type: Tipo, isConst: boolean, isRef: boolean): Simbolo | null {
         id = id.toLowerCase();
         if (this.vars.get(id) != undefined) {
@@ -48,23 +51,23 @@ export class Entorno {
         this.vars.set(id, newVar);
         return newVar;
     }
-/*
-    public addFunc(func: FunctionSt, uniqueId: string) : boolean{
-        if(this.functions.has(func.id.toLowerCase())){
+
+    public guardarFuncion(func: Funcion, uniqueId: string) : boolean{
+        if(this.funciones.has(func.id.toLowerCase())){
             return false;
         }
-        this.functions.set(func.id.toLowerCase(),new SymbolFunction(func,uniqueId));
+        this.funciones.set(func.id.toLowerCase(), func);
         return true;
     }
 
-    public addStruct(id: string, size: number, params: Array<Param>) : boolean{
-        if(this.structs.has(id.toLocaleLowerCase())){
+    public definirType(id: string, size: number, params: Map<string, AtributoType>) : boolean{
+        if(this.types.has(id.toLocaleLowerCase())){
             return false;
         }
-        this.structs.set(id.toLowerCase(),new SymbolStruct(id.toLowerCase(),size,params));
+        this.types.set(id.toLowerCase(),new SimboloType(id.toLowerCase(),params, size));
         return true;
     }
-*/
+
     public getVar(id: string) : Simbolo | null{
         let env : Entorno | null = this;
         id = id.toLowerCase();
@@ -77,38 +80,37 @@ export class Entorno {
         }
         return null;
     }
-/*
-    public getFunc(id: string) : SymbolFunction | undefined{
-        return this.functions.get(id.toLocaleLowerCase());
+
+    public getFuncion(id: string) : Funcion | undefined{
+        return this.funciones.get(id.toLocaleLowerCase());
     }
 
-    public searchFunc(id: string) : SymbolFunction | null{
-        let enviorement : Enviorement | null = this;
+    public buscarFuncion(id: string) : Funcion | null{
+        let env : Entorno | null = this;
         id = id.toLowerCase();
-        while(enviorement != null){
-            const sym = enviorement.functions.get(id);
+        while(env != null){
+            const sym = env.funciones.get(id);
             if(sym != undefined){
                 return sym;
             }
-            enviorement = enviorement.anterior;
+            env = env.anterior;
         }
         return null;
     }
 
-    public structExists(id: string){
-        return this.structs.get(id.toLocaleLowerCase());
+    public hasType(id: string){
+        return this.types.get(id.toLocaleLowerCase());
     }
 
-    public searchStruct(id: string) : SymbolStruct | null{
-        let enviorement : Enviorement | null = this;
+    public buscarType(id: string) : SimboloType | null{
+        let env : Entorno | null = this;
         id = id.toLowerCase();
-        while(enviorement != null){
-            const sym = enviorement.structs.get(id);
-            if(sym != undefined){
+        while(env != null){
+            const sym = env.types.get(id);
+            if(sym != undefined)
                 return sym;
-            }
-            enviorement = enviorement.anterior;
+            env = env.anterior;
         }
         return null;
-    }*/
+    }
 }
