@@ -48,7 +48,11 @@ export class Funcion extends Instruccion {
         newEnv.guardarMetadata(this.id, this, ret);
 
         this.parametros.forEach((param)=>{
-            newEnv.addVar(param.id,param.tipo,false,false);
+            if(param.tipo.type == Tipos.ARRAY || param.tipo.type == Tipos.TYPE || param.tipo.type == Tipos.STRING){
+                newEnv.addVar(param.id,param.tipo,false,true);                
+            }else{
+                newEnv.addVar(param.id,param.tipo,false,false);
+            }
         });
 
         generator.clearTempStorage();
