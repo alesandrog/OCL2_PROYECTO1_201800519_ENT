@@ -65,10 +65,45 @@ export class AccesoArreglo extends Expresion {
             console.log(arreglo);
                 // Compilar indice de acceso
             const indice = this.indice.compile(env);
+
+
             // Generar temporal para obtener el arreglo de stack
             const ptrStack = generator.newTemporal();
-            generator.addGetStack(ptrStack, arreglo.position);
+            
+            if(arreglo.isHeap){
+                // Generar temporal para acceder a la referencia
+                const accesoReferencia = generator.newTemporal();
+                if (arreglo.isGlobal){
+                    generator.addGetStack(ptrStack, arreglo.position);                    
+                }else{
+                    const tempAux = generator.newTemporal(); generator.freeTemp(tempAux);
+                    generator.addExpression(tempAux, 'p', arreglo.position, '+');                    
+                    generator.addGetStack(ptrStack, tempAux);
+                }                
+                generator.addGetStack(accesoReferencia, ptrStack);
+                // Incrementar el ptrStack para posicionarse sobre los valors
+                generator.addExpression(accesoReferencia, accesoReferencia, 1, '+');
+                // Mover el puntero al indice deseado
+                generator.addExpression(accesoReferencia, accesoReferencia, indice.getValue(), '+');
+                // Verificar si se esta buscando un puntero para asignacion
+                if(this.tipoAcc == "asig" && this.final == true)
+                    return new Retorno(accesoReferencia,true, new Tipo(arreglo.type.subTipo));                    
+                // Acceder al valor
+                const valorHeap = generator.newTemporal();
+                generator.addGetHeap(valorHeap, accesoReferencia);
+                // Liberar temporal
+                generator.freeTemp(accesoReferencia);
+                // Retornar puntero accedido
+                return new Retorno(valorHeap,true, new Tipo(arreglo.type.subTipo));                                 
+            }else{
             // Incrementar el ptrStack para posicionarse sobre los valors
+            if (arreglo.isGlobal){
+                generator.addGetStack(ptrStack, arreglo.position);                    
+            }else{
+                const tempAux = generator.newTemporal(); generator.freeTemp(tempAux);
+                generator.addExpression(tempAux, 'p', arreglo.position, '+');                    
+                generator.addGetStack(ptrStack, tempAux);
+            }            
             generator.addExpression(ptrStack, ptrStack, 1, '+');
             // Mover el puntero al indice deseado
             generator.addExpression(ptrStack, ptrStack, indice.getValue(), '+');
@@ -81,7 +116,8 @@ export class AccesoArreglo extends Expresion {
             // Liberar temporal
             generator.freeTemp(ptrStack);
             // Retornar puntero accedido
-            return new Retorno(valorHeap,true, new Tipo(arreglo.type.subTipo));            
+            return new Retorno(valorHeap,true, new Tipo(arreglo.type.subTipo)); 
+            }           
         }
     }
 }
