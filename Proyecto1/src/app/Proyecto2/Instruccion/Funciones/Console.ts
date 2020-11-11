@@ -20,6 +20,7 @@ export class Console extends Instruccion {
 
         if(value.type.type == Tipos.NUMBER){
             generator.addPrint('d', 'int',value.getValue());
+            generator.addPrint('c', 'int',10);            
         }else if(value.type.type == Tipos.BOOLEAN){
             
         }else{ // string
@@ -36,6 +37,7 @@ export class Console extends Instruccion {
         generator.addExpression(tempIterador, tempIterador, '1', '+');
         generator.addGoto(printLbl);
         generator.addLabel(exitLbl);
+        generator.addPrint('c', 'int',10); 
         }
 
 
