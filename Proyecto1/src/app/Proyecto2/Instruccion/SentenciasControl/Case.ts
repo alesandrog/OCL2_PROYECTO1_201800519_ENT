@@ -16,9 +16,8 @@ export class Case extends Instruccion {
     }
 
     compile(env: Entorno): void {
-        const newEnv = new Entorno(env);
         this.instrucciones.forEach((instr)=>{
-            instr.compile(newEnv);
+            instr.compile(env);
         });
     }
 }

@@ -10,7 +10,7 @@ export class Continue extends Instruccion{
         super(line,column);
     }
     compile(env:Entorno) : void{
-        if(env.break == null)
+        if(env.continue == null)
             throw new Error_(this.line,this.column,'Semantico',' Continue fuera de ciclo');
         const generator = Generator.getInstance();
         generator.addGoto(env.continue);
