@@ -4,8 +4,6 @@ import { Expresion } from "../../Abstract/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Generator } from "../../Generator/Generator";
 import { Error_ } from "../../Util/Error_";
-import { Retorno } from '../../Util/Retorno';
-
 export class Asignacion extends Instruccion {
     private id: string ;
     private value: Expresion;
@@ -21,12 +19,12 @@ export class Asignacion extends Instruccion {
         // Buscar variable en la tabla de simbolos        
         const symbol = env.getVar(this.id);
         if (symbol == null) 
-            throw new Error_(this.line, this.column, 'Semantico', `No existe la variable ${this.id}`);
+            throw new Error_(this.line, this.column, 'Semantico', ` Variable ${this.id} no definida en el ambito`);
 
         const value = this.value.compile(env);
 
         if (!this.sameType(symbol.type, value.type)) {
-            throw new Error_(this.line,this.column,'Semantico',' Tipos de dato diferentes');
+            throw new Error_(this.line,this.column,'Semantico',` Tipos de dato incompatibles: ${value.type.type} no asignable a ${symbol.type.type} `);
         }
         if (symbol?.isGlobal) {
             if (symbol.type.type == Tipos.BOOLEAN) {
@@ -79,14 +77,5 @@ export class Asignacion extends Instruccion {
             }
         }
 
-    }
-
-    private validateType(env: Entorno){
-     /*   if(this.type.type == Tipos.STRUCT){
-            const struct = enviorement.searchStruct(this.type.typeId);
-            if(!struct)
-                throw new Error(this.line,this.column,'Semantico',`No existe el struct ${this.type.typeId}`);
-            this.type.struct = struct;
-        }*/
     }
 }

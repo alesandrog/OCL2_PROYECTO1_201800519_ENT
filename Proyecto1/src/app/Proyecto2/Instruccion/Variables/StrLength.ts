@@ -25,6 +25,7 @@ export class StrLength extends Expresion {
         const temporalAcceso = this.id.compile(env);
         if(temporalAcceso == null || temporalAcceso == undefined)
             throw new Error_(this.line, this.column, 'Semantico', ` Error al acceder`);
+            
         if(this.id instanceof Acceso){
             if(temporalAcceso.type.type == Tipos.STRING){
                 // Obtener inicio del string y guardarlo en stack

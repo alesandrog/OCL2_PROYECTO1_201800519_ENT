@@ -23,7 +23,7 @@ export class UpperString extends Expresion {
         if(temporalAcceso == null || temporalAcceso == undefined)
             throw new Error_(this.line, this.column, 'Semantico', ` Error al acceder`);
         if(temporalAcceso.type.type != Tipos.STRING)
-            throw new Error_(this.line, this.column, 'Semantico', ` Funcion no aplicable a tipo ${temporalAcceso.type.type}`);            
+           throw new Error_(this.line, this.column, 'Semantico', ` ToUpperCase no operable con ${temporalAcceso.type.type}`);        
         generator.addNextEnv(env.size + 1);
         // Temporal para almacenar el nuevo valor de p
         const pTemp = generator.newTemporal();  

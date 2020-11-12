@@ -26,6 +26,8 @@ export class charAt extends Expresion {
         const temporalAcceso = this.id.compile(env);
         if(temporalAcceso == null || temporalAcceso == undefined)
             throw new Error_(this.line, this.column, 'Semantico', ` Error al acceder`);
+        if(temporalAcceso.type.type != Tipos.STRING)
+           throw new Error_(this.line, this.column, 'Semantico', ` charAt no operable con ${temporalAcceso.type.type}`);
         generator.addNextEnv(env.size + 1);
 
         //--- PASO DE PRIMER PARAMETRO ---
@@ -39,6 +41,8 @@ export class charAt extends Expresion {
         generator.addExpression(pTemp, pTemp, '1', '+');
         // Ejecutar indice
         const indice = this.index.compile(env);
+        if(indice.type.type != Tipos.NUMBER)
+           throw new Error_(this.line, this.column, 'Semantico', ` charAt no operable con ${indice.type.type}`);        
         generator.addSetStack(pTemp, indice.getValue());
 
         // Llamar la funcion
