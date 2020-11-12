@@ -3,3 +3,110 @@ table
     table-layout:fixed;
     width:100%;
 }
+
+.editor-container{
+    position: absolute;
+    width: 100%;
+    left: 0;
+
+}
+
+.text_editor{
+    position: relative;    
+    height: 500px;
+    width: 1000px;
+    padding: 5px;
+    background-color: #17141D;
+    border-radius: 10px;
+}
+
+.input_editor{
+
+    display: inline-block;
+    height: 700px;
+    width: 50%;
+    left:  0;
+    margin-top: 20px;
+}
+
+.consola{
+
+    display: inline-block;
+    position: absolute;
+    height: 700px;
+    width: 50%;
+    margin-top: 20px;
+    left : 50%;
+
+}
+
+#barra-principal{
+    background-color: #313131;    
+    
+}
+
+#barra-principal button{
+    background-color: #313131;    
+    transform: translateY(-50%);
+    border-width: 0px;
+}
+
+#barra-principal button:hover{
+    background-color: #1E1E1E;
+}
+
+#botonera{
+    position: absolute;
+    left: 50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+
+.iconos{
+    background-color: white;
+}
+
+
+.menu{
+    display: inline-block;
+    position: absolute;
+    height: 90%;
+    width: 5%;
+    background-color: green;
+}
+
+.menu button{   
+    display: list-item;
+    margin:10px;
+    margin-left: 50%;
+    transform: translate(-50%);
+    background-color: #3178C6;
+    border-width: 0px;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: wheat;
+}
+
+
+
+ ::-webkit-scrollbar {
+    width: 2px;
+  }
+  
+   ::-webkit-scrollbar-thumb {
+    border-radius: 30px;
+    background: #3178C6;
+    box-shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.25), inset -2px -2px -2px rgba(0, 0, 0, 0.25);
+  }
+  
+   ::-webkit-scrollbar-track {
+    background: #282A36;
+  }
+
+footer{
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #3178C6;
+}

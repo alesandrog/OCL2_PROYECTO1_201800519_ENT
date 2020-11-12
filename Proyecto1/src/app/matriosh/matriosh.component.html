@@ -1,54 +1,51 @@
-<div class="container-fluid" style="padding-top: 5%;">
-    <div class="row">
-      <div class="col">
-        <div class="dropdown" >
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Acciones
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <button class="dropdown-item" type="button" (click)="traducir()">Traducir</button>
-            <button class="dropdown-item" type="button" (click)="ejecutar()">Ejecutar</button>
-            <button class="dropdown-item" type="button" (click)="generarAst()">Generar AST</button>
-            <button class="dropdown-item" type="button" (click)="limpiar()">Limpiar</button>
-          </div>
-        </div>
+<div class="container-fluid" >
+    <div class="row" id="barra-principal" style="padding-top: 2%;">        
+      <div class="col-2" style="color: white;  display: inline-block;" >
+        <h4 style="display: inline;">Editor</h4>   
       </div>
-    </div>
+    <div class="col-8">
+      <div class="btn-group" id="botonera" role="group" aria-label="Basic example" >
+        <button type="button" class="btn btn-secondary" (click)="c3d()">
+          
+          <img src="../../assets/terminal.png" alt="" srcset="">
 
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-6 " >
-        <h4>Editor</h4>    
-      </div>
-      <div class="col-6 ">
-        <h4>Output</h4>    
+        </button>
+        <button type="button" class="btn btn-secondary">
+          
+          <img src="../../assets/translate.png" alt="" srcset="">
+          
+        </button>
+        <button type="button" class="btn btn-secondary">
+          
+          <img src="../../assets/ast.png" alt="" srcset="">
+          
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="limpiar()">
+          Limpiar          
+        </button>        
+      </div> 
+    </div>      
+      <div class="col-2" style="color: white; text-align: right;">
+        <h4>C3D</h4>    
       </div>
     </div>      
 
 
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-6 " style="height: 300px;">
-        <div class="input_editor" #inputEditor style="height: 100%; width: 100%;"></div>
-      </div>
-      <div class="col-6 ">
-        <div class="consola" #consola style="height: 100%; width: 100%;"></div>
-      </div>
+    <div class="editor-container">        
+          <div class="input_editor" #inputEditor ></div> 
+          <div class="consola" #consola ></div>
     </div>
 
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-6 ">
-        <h5 >Salida Traduccion</h5>          
-      </div>
-      <div class="col-6 ">
+  <div class="row" style="padding-top: 2%; margin-top: 500px; color: white;">          
+      <div class="col-12">
         <h4>Tabla de Simbolos</h4>    
       </div>
     </div>
 
 
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-6 " style="height: 300px;">
-        <div class="output_editor" #outputEditor style="height: 100%; width: 100%;"></div>
-      </div>
-      <div class="col-6 table-responsive overflow-auto" style="height: 300px !important;">
+    <div class="row" style="padding-top: 2%; color: white;">        
+
+      <div class="col-12 table-responsive overflow-auto" style="height: 300px !important;">
         <table class="table">
           <thead>
             <tr>
@@ -60,7 +57,7 @@
           <tbody *ngFor="let smb of tablaSimbolos">
             <tr>
               <td>{{ smb.id }}</td>
-              <td>{{ smb.tipo }}</td>
+              <td>{{ smb.tipoReporte }}</td>
               <td>{{ smb.idEntorno }}</td>              
             </tr>            
           </tbody>
@@ -69,14 +66,14 @@
     </div>
 
 
-    <div class="row" style="padding-top: 2%;">        
-      <div class="col-12 " >
+    <div class="row" style="padding-top: 2%; color: white;">        
+      <div class="col-12 ">
         <h4>Reporte de Errores</h4>    
       </div>
     </div>      
 
-    <div class="row" style="padding-top: 2%;">
-      <div class="col-12 " style="height: 300px;">
+    <div class="row" style="padding-top: 2%; color: white;">
+      <div class="col-12 table-responsive overflow-auto" style="height: 300px !important; ">
         <table class="table">
           <thead>
             <tr>
@@ -95,4 +92,12 @@
         </table>
       </div>    
     </div>
+    <div class="row" style="padding-top: 2%; color: white;">        
+      <div class="col-12 " >
+        <h4>AST</h4>    
+      </div>
+    </div>      
+    <div class="row">
+      <div #network style="max-height: 500px; width: 100%;" ></div>
+    </div>  
   </div>
