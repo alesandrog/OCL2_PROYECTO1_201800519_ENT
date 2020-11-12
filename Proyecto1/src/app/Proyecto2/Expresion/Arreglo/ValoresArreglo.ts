@@ -16,7 +16,6 @@ export class ValoresArreglo extends Expresion {
     public compile(env: Entorno): Retorno {
         
         const generator = Generator.getInstance();
-        console.log(this);
 
         // Guardar en un temporal la primera posicion del arreglo
         const temp = generator.newTemporal();
@@ -34,9 +33,11 @@ export class ValoresArreglo extends Expresion {
         generator.addExpression(puntero, puntero, '1' , '+');
 
         // Ejecutar todos los valores que van dentro y guardarlos en heap
+        let subtipoAux: Tipo;
         this.valores.forEach((val)=>{
             console.log(val);
             const valor = val.compile(env);
+            subtipoAux = valor.type;
             generator.addSetHeap(puntero, valor.getValue());
             generator.addExpression(puntero, puntero, '1' , '+');
         });
@@ -44,6 +45,7 @@ export class ValoresArreglo extends Expresion {
         generator.freeTemp(puntero);
         // Retornar el puntero a la primera casilla
         const tipo = new Tipo(Tipos.ARRAY);
+        tipo.subTipo = subtipoAux.type;
         return new Retorno(temp,true, tipo);        
     }
 }

@@ -29,8 +29,9 @@ export class And extends Expresion{
         //La etiqueta verdadera del segundo sera la etiqueta verdadera del and
         this.right.trueLabel = this.trueLabel;
         //Para izquierda y derecha, la etiqueta falsa es la etiqueta falsa del and
-        this.left.falseLabel = this.right.falseLabel = this.falseLabel;
-
+        this.left.falseLabel = this.falseLabel;
+        this.right.falseLabel = this.falseLabel;
+        
         //Generar c3d
         const left = this.left.compile(env);
         generator.addLabel(this.left.trueLabel);
@@ -44,6 +45,6 @@ export class And extends Expresion{
             retorno.falseLabel = this.right.falseLabel;
             return retorno;
         }
-        throw new Error_(this.line, this.column, 'Semantico', `No se puede And: ${left.type.type} && ${right.type.type}`);
+        throw new Error_(this.line, this.column, 'Semantico', `No se puede operar And: ${left.type.type} && ${right.type.type}`);
     }
 }

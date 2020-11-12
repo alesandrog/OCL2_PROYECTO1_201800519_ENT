@@ -28,7 +28,6 @@ export class Primitivo extends Expresion {
                 this.trueLabel = this.trueLabel == '' ? generator.newLabel() : this.trueLabel;
                 //Generar etiqueta falsa, si no tiene
                 this.falseLabel = this.falseLabel == '' ? generator.newLabel() : this.falseLabel;
-                // Si es true genero goto a su etiqueta verdadera, si no, a su etiqueta falsa
                 this.value ? generator.addGoto(this.trueLabel) : generator.addGoto(this.falseLabel);
                 //Guardar en el retorno las etiquetas verdaderas y falsas
                 retorno.trueLabel = this.trueLabel;

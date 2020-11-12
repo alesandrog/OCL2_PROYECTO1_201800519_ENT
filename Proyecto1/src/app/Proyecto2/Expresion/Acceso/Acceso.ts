@@ -3,24 +3,21 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Util/Retorno";
 import { Generator } from "../../Generator/Generator";
 import { Tipos, Tipo } from "../../Util/Tipo";
-import { Simbolo } from "../../TablaSimbolos/Simbolo";
 import { Error_ } from '../../Util/Error_';
 
 export class Acceso extends Expresion {
     private id: string;
-    private anterior: Expresion | null;
 
     constructor(id: string, line: number, column: number) {
         super(line, column);
         this.id = id;
-//        this.anterior = anterior;
     }
 
     compile(env: Entorno): Retorno {
         const generator = Generator.getInstance();
             let symbol = env.getVar(this.id);
             if (symbol == null) {
-                throw new Error_(this.line, this.column, 'Semantico', `No existe la variable: ${this.id}`);
+                throw new Error_(this.line, this.column, 'Semantico', ` Variable: ${this.id} no definida en el ambito`);
             }
             const temp = generator.newTemporal();
             if (symbol.isGlobal) {

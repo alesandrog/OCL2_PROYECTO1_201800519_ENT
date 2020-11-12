@@ -3,7 +3,7 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Util/Retorno";
 import { Generator } from "../../Generator/Generator";
 import { Tipos, Tipo } from "../../Util/Tipo";
-//import { Error } from "../../Utils/Error";
+import { Error_ } from "../../Util/Error_";
 
 export class Modulo extends Expresion {
     private left: Expresion;
@@ -24,6 +24,6 @@ export class Modulo extends Expresion {
             generator.addExpression(temp, left.getValue(), right.getValue(), '%');
             return new Retorno(temp, true, new Tipo(Tipos.NUMBER));            
         }        
- //       throw new Error(this.line, this.column, 'Semantico', `No se puede sumar ${left.type.type} + ${right.type.type}`);
+        throw new Error_(this.line, this.column, 'Semantico', ` Modulo no operable: ${left.type.type} % ${right.type.type}`);
     }
 }

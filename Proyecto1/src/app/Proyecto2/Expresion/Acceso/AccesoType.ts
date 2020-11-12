@@ -37,14 +37,13 @@ export class AccesoType extends Expresion {
                 this.anterior.id = this.id;
                 // Operar el acceso anterior (devuelve puntero a inicio del siguiente type)
                 const resAnterior = this.anterior.compile(env);
-                console.log(" EN ACCESO TYPE");
-                console.log(this);
-                console.log(resAnterior);
                 // Buscar el type que corresponde
                 const type = env.buscarType(resAnterior.type.subTipo);
                 if(type == null || type == undefined)
-                    throw new Error_(this.linea, this.columna, 'Semantico', 'Acceso Indefinido ');                
+                   throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido: Type ${resAnterior.type.subTipo} no declarado en el ambito `);                             
                 const atributo = type.atributos.get(this.indice);
+                if(atributo == null || atributo == undefined)
+                    throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido `);                
                 // Incrementar el ptrStack para posicionarse sobre los valors
                 generator.addExpression(resAnterior.getValue(), resAnterior.getValue(), 1, '+');
                 // Mover el puntero al indice deseado
@@ -64,15 +63,12 @@ export class AccesoType extends Expresion {
         }else{
             // Buscar el arreglo en la tabla de simbolos
             const variable = env.getVar(this.id);
-            console.log("TYPE");
-            console.log(variable);
-            console.log(env.vars);
             if(variable == null || variable == undefined)
-                throw new Error_(this.linea, this.columna, 'Semantico', 'Acceso Indefinido '); 
+                throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido: Variable ${this.id} no declarada en el ambito `); 
             // Buscar el type que corresponde
             const type = env.buscarType(variable.type.subTipo);
             if(type == null || type == undefined)
-                throw new Error_(this.linea, this.columna, 'Semantico', 'Acceso Indefinido ');             
+                throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido: Type ${variable.type.subTipo} no declarado en el ambito `);             
             // Generar temporal para obtener el arreglo de stack
             const ptrStack = generator.newTemporal();
             //generator.addGetStack(ptrStack, variable.position);
@@ -84,51 +80,56 @@ export class AccesoType extends Expresion {
                     generator.addExpression(tempAux, 'p', variable.position, '+');                    
                     generator.addGetStack(ptrStack, tempAux);
                 }                
-            // Generar temporal para acceder a la referencia
-            const accesoReferencia = generator.newTemporal();
-            generator.addGetStack(accesoReferencia, ptrStack)
-            // Obtener el indice del atributo
-            const atributo = type.atributos.get(this.indice);
-            // Incrementar el ptrStack para posicionarse sobre los valors
-            generator.addExpression(accesoReferencia, accesoReferencia, 1, '+');
-            // Mover el puntero al indice deseado
-            generator.addExpression(accesoReferencia, accesoReferencia, atributo.indice, '+');
-            // Verificar si se esta buscando un puntero para asignacion
-            if(this.tipoAcc == "asig" && this.final == true)
-              return new Retorno(accesoReferencia,true, atributo.tipo);                    
-            // Acceder al valor
-            const valorHeap = generator.newTemporal();
-            generator.addGetHeap(valorHeap, accesoReferencia);
-            // Liberar temporal
-            generator.freeTemp(ptrStack);
-            generator.freeTemp(accesoReferencia);            
-            // Retornar puntero accedido
-            return new Retorno(valorHeap,true, atributo.tipo);            
+                // Generar temporal para acceder a la referencia
+                const accesoReferencia = generator.newTemporal();
+                generator.addGetStack(accesoReferencia, ptrStack)
+                // Obtener el indice del atributo
+                const atributo = type.atributos.get(this.indice);
+                if(atributo == null || atributo == undefined)
+                    throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido `);
+                // Incrementar el ptrStack para posicionarse sobre los valors
+                generator.addExpression(accesoReferencia, accesoReferencia, 1, '+');
+                // Mover el puntero al indice deseado
+                generator.addExpression(accesoReferencia, accesoReferencia, atributo.indice, '+');
+                // Verificar si se esta buscando un puntero para asignacion
+                if(this.tipoAcc == "asig" && this.final == true)
+                return new Retorno(accesoReferencia,true, atributo.tipo);                    
+                // Acceder al valor
+                const valorHeap = generator.newTemporal();
+                generator.addGetHeap(valorHeap, accesoReferencia);
+                // Liberar temporal
+                generator.freeTemp(ptrStack);
+                generator.freeTemp(accesoReferencia);            
+                // Retornar puntero accedido
+                return new Retorno(valorHeap,true, atributo.tipo);            
 
             }else{
-            // Obtener el indice del atributo
-            const atributo = type.atributos.get(this.indice);
-            if (variable.isGlobal){
-                generator.addGetStack(ptrStack, variable.position);                    
-            }else{
-                const tempAux = generator.newTemporal(); generator.freeTemp(tempAux);
-                generator.addExpression(tempAux, 'p', variable.position, '+');                    
-                generator.addGetStack(ptrStack, tempAux);
-            }            
-            // Incrementar el ptrStack para posicionarse sobre los valors
-            generator.addExpression(ptrStack, ptrStack, 1, '+');
-            // Mover el puntero al indice deseado
-            generator.addExpression(ptrStack, ptrStack, atributo.indice, '+');
-            // Verificar si se esta buscando un puntero para asignacion
-            if(this.tipoAcc == "asig" && this.final == true)
-              return new Retorno(ptrStack,true, atributo.tipo);                    
-            // Acceder al valor
-            const valorHeap = generator.newTemporal();
-            generator.addGetHeap(valorHeap, ptrStack);
-            // Liberar temporal
-            generator.freeTemp(ptrStack);
-            // Retornar puntero accedido
-            return new Retorno(valorHeap,true, atributo.tipo);            
+                // Obtener el indice del atributo
+                const atributo = type.atributos.get(this.indice);
+                if(atributo == null || atributo == undefined)
+                    throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido `);             
+
+                if (variable.isGlobal){
+                    generator.addGetStack(ptrStack, variable.position);                    
+                }else{
+                    const tempAux = generator.newTemporal(); generator.freeTemp(tempAux);
+                    generator.addExpression(tempAux, 'p', variable.position, '+');                    
+                    generator.addGetStack(ptrStack, tempAux);
+                }            
+                // Incrementar el ptrStack para posicionarse sobre los valors
+                generator.addExpression(ptrStack, ptrStack, 1, '+');
+                // Mover el puntero al indice deseado
+                generator.addExpression(ptrStack, ptrStack, atributo.indice, '+');
+                // Verificar si se esta buscando un puntero para asignacion
+                if(this.tipoAcc == "asig" && this.final == true)
+                return new Retorno(ptrStack,true, atributo.tipo);                    
+                // Acceder al valor
+                const valorHeap = generator.newTemporal();
+                generator.addGetHeap(valorHeap, ptrStack);
+                // Liberar temporal
+                generator.freeTemp(ptrStack);
+                // Retornar puntero accedido
+                return new Retorno(valorHeap,true, atributo.tipo);            
             }
 
         }

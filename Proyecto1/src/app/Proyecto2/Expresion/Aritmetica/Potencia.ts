@@ -41,7 +41,7 @@ export class Potencia extends Expresion {
             generator.addLabel(exitLbl);
             return new Retorno(temp, true, new Tipo(Tipos.NUMBER));            
         }        
-        throw new Error_(this.line, this.column, 'Semantico', ` Tipos no numericos en potencia`);
+        throw new Error_(this.line, this.column, 'Semantico', ` Potencia no operable: ${left.type.type} ** ${right.type.type}`);
     }
 }
 

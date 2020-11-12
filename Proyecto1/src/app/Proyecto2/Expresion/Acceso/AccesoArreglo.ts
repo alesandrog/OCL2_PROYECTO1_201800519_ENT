@@ -37,6 +37,8 @@ export class AccesoArreglo extends Expresion {
                 this.anterior.id = this.id;
                 // Operar el acceso anterior (devuelve puntero a inicio del siguiente arreglo)
                 const resAnterior = this.anterior.compile(env);
+                if(resAnterior == null || resAnterior == undefined)
+                    throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido `);                 
                 // Compilar el indice
                 const indice = this.indice.compile(env);
                 // Generar temporal para operar el indice de acceso
@@ -61,15 +63,11 @@ export class AccesoArreglo extends Expresion {
             // Buscar el arreglo en la tabla de simbolos
             const arreglo = env.getVar(this.id);
             if(arreglo == null || arreglo == undefined)
-                throw new Error_(this.linea, this.columna, 'Semantico', 'Acceso Indefinido '); 
-            console.log(arreglo);
+                throw new Error_(this.linea, this.columna, 'Semantico', `Acceso Indefinido: Arreglo ${this.id} no definido`); 
                 // Compilar indice de acceso
             const indice = this.indice.compile(env);
-
-
             // Generar temporal para obtener el arreglo de stack
-            const ptrStack = generator.newTemporal();
-            
+            const ptrStack = generator.newTemporal();            
             if(arreglo.isHeap){
                 // Generar temporal para acceder a la referencia
                 const accesoReferencia = generator.newTemporal();
