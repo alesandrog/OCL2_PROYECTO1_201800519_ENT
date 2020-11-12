@@ -1,4 +1,3 @@
-import { networkInterfaces } from 'os';
 import { Entorno } from "../TablaSimbolos/Entorno";
 import { Generator } from "./Generator";
 
@@ -9,7 +8,12 @@ export class FuncionesNativas{
     }
 
     public toUpper(){
+        
         const generator = Generator.getInstance();
+
+        generator.inicioMetodo();   
+        generator.nombreMetodo("ToUpperCase");     
+
         // Generar etiqueta para simular for 
         const lblCiclo = generator.newLabel();
         // Etiqueta para hacer cambio a mayusculas
@@ -24,9 +28,15 @@ export class FuncionesNativas{
         const punteroHeap = generator.newTemporal();
         // Generar temporal para guardar el acceso a heap
         const accesoHeap = generator.newTemporal();
+        // Temporal para retornar el apuntador al nuevo string
+        const ret = generator.newTemporal();
+        
+        const labelIncremento2 = generator.newLabel();
 
+        // Guardar la posicion de h al iniciar
+        generator.addExpression(ret, 'h');
         // Acceder al 'parametro' ( string a afectar )
-        generator.addExpression(param, 'p', 0, '+');
+        generator.addExpression(param, 'p', 1, '+');
         // Acceder a la posicion inicial del string
         generator.addGetStack(punteroHeap, param);
         // Imprimir etiqueta inicial
@@ -43,19 +53,42 @@ export class FuncionesNativas{
         // Restar 32 para obtener ascii de la mayuscula
         generator.addExpression(accesoHeap, accesoHeap, '32', '-');
         // Asignar a heap su nuevo valor
-        generator.addSetHeap(punteroHeap, accesoHeap);
+        generator.addSetHeap('h', accesoHeap);
+        generator.nextHeap();        
+        generator.addGoto(labelIncremento2);
         // Imprimir etiqueta incremento
         generator.addLabel(lblIncremento);
         // Aumentar puntero a heap y repetir ciclo
+        generator.addSetHeap('h', accesoHeap);
+        generator.nextHeap();       
+        
+        generator.addLabel(labelIncremento2);
+
         generator.addExpression(punteroHeap, punteroHeap, '1', '+');
         generator.addGoto(lblCiclo);
+        
         // Imprimir salida
         generator.addLabel(lblExit);
+        generator.addSetHeap('h', -1);
+        generator.nextHeap();
+
+        // Retornar el puntero al nuevo string
+        const tempRet = generator.newTemporal();
+        generator.addExpression(tempRet, 'p');
+        generator.addSetStack(tempRet, ret);
+        
+        
+        generator.returnMetodo();        
+        generator.finMetodo();             
     }
 
 
     public toLower(){
         const generator = Generator.getInstance();
+
+        generator.inicioMetodo();   
+        generator.nombreMetodo("ToLowerCase"); 
+
         // Generar etiqueta para simular for 
         const lblCiclo = generator.newLabel();
         // Etiqueta para hacer cambio a mayusculas
@@ -70,9 +103,14 @@ export class FuncionesNativas{
         const punteroHeap = generator.newTemporal();
         // Generar temporal para guardar el acceso a heap
         const accesoHeap = generator.newTemporal();
+        // Temporal para retornar el apuntador al nuevo string
+        const ret = generator.newTemporal();
+        const labelIncremento2 = generator.newLabel();
 
+        // Guardar la posicion de h al iniciar
+        generator.addExpression(ret, 'h');
         // Acceder al 'parametro' ( string a afectar )
-        generator.addExpression(param, 'p', 0, '+');
+        generator.addExpression(param, 'p', 1, '+');
         // Acceder a la posicion inicial del string
         generator.addGetStack(punteroHeap, param);
         // Imprimir etiqueta inicial
@@ -89,14 +127,27 @@ export class FuncionesNativas{
         // Restar 32 para obtener ascii de la mayuscula
         generator.addExpression(accesoHeap, accesoHeap, '32', '+');
         // Asignar a heap su nuevo valor
-        generator.addSetHeap(punteroHeap, accesoHeap);
+        generator.addSetHeap('h', accesoHeap);
+        generator.nextHeap();        
+        generator.addGoto(labelIncremento2);
         // Imprimir etiqueta incremento
         generator.addLabel(lblIncremento);
         // Aumentar puntero a heap y repetir ciclo
+        generator.addSetHeap('h', accesoHeap);
+        generator.nextHeap();       
+        generator.addLabel(labelIncremento2);
         generator.addExpression(punteroHeap, punteroHeap, '1', '+');
         generator.addGoto(lblCiclo);
         // Imprimir salida
         generator.addLabel(lblExit);
+        generator.addSetHeap('h', -1);
+        generator.nextHeap();
+        // Retornar el puntero al nuevo string
+        const tempRet = generator.newTemporal();
+        generator.addExpression(tempRet, 'p');
+        generator.addSetStack(tempRet, ret);        
+        generator.returnMetodo();        
+        generator.finMetodo();   
     }
     
     
@@ -110,59 +161,39 @@ export class FuncionesNativas{
 
         // Temporal para acceder al primer parametro (pos. inicial string)
         const param1 = generator.newTemporal();
-        generator.addExpression(param1, 'p', '0', '+');
+        generator.addExpression(param1, 'p', '1', '+');
         // Acceder y guardar el valor
         const punteroHeap = generator.newTemporal();
         generator.addGetStack(punteroHeap, param1);
 
         // Temporal para almacenar indice al que se quiere acceder
         const param2 = generator.newTemporal();
-        generator.addExpression(param2, 'p', '1', '+');
+        generator.addExpression(param2, 'p', '2', '+');
         // Acceder y guardar el valor
         const charIndex = generator.newTemporal();
         generator.addGetStack(charIndex, param2);
+
         
-        // Temporal para controlar iteraciones
-        const iterator = generator.newTemporal();
-        generator.addExpression(iterator, '1');
+        const posRelativa = generator.newTemporal();
+        generator.addExpression(posRelativa, punteroHeap, charIndex, '+');
 
-        // Generar etiqueta para simular for 
-        const lblCiclo = generator.newLabel();
-        generator.addLabel(lblCiclo);
+        const caracter = generator.newTemporal();
+        generator.addGetHeap(caracter, posRelativa);
 
-        // Generar temporal para guardar el acceso a heap
-        const accesoHeap = generator.newTemporal();
-        // Obtener el valor de heap
-        generator.addGetHeap(accesoHeap, punteroHeap);
-
-        // Etiqueta para retornar el char deseado
-        const lblOperacion = generator.newLabel();
-        // Etiqueta para incrementar puntero y simular ciclo
-        const lblIncremento = generator.newLabel();
+        const res = generator.newTemporal();
+        generator.addExpression(res, 'h');
+        generator.addSetHeap('h', caracter);
+        generator.nextHeap();
+        generator.addSetHeap('h', '-1');
+        generator.nextHeap();        
         // Etiqueta de salida
         const lblExit = generator.newLabel();
-
-        // Comparar si es fin de cadena
-        generator.addIf(accesoHeap, '-1', '==', lblExit);
-        // Comparar si el indice es el buscado
-        generator.addIf(iterator, charIndex, '==', lblOperacion);
-        // Saltar a incremento de iterador
-        generator.addGoto(lblIncremento);
-        // Retornar el char
-        generator.addLabel(lblOperacion);
-        // Generar temporal para acceder a posicion de return
-        const tempRet = generator.newTemporal();
-        generator.addExpression(tempRet, 'p', '2', '+');
-        generator.addSetStack(tempRet, accesoHeap);
-        generator.addGoto(lblExit);
-
-        // Etiqueta Incremento
-        generator.addLabel(lblIncremento);
-        generator.addExpression(punteroHeap, punteroHeap, '1', '+');
-        generator.addExpression(iterator, iterator, '1', '+');
-        generator.addGoto(lblCiclo);
         // Imprimir salida
         generator.addLabel(lblExit);  
+        // Generar temporal para acceder a posicion de return
+        const tempRet = generator.newTemporal();
+        generator.addExpression(tempRet, 'p');
+        generator.addSetStack(tempRet, res);
         
         generator.returnMetodo();        
         generator.finMetodo();        
@@ -171,9 +202,13 @@ export class FuncionesNativas{
 
     public strLength(){
         const generator = Generator.getInstance();
+
+        generator.inicioMetodo();   
+        generator.nombreMetodo("Length"); 
+
         // Temporal para acceder al primer parametro (pos. inicial string)
         const param1 = generator.newTemporal();
-        generator.addExpression(param1, 'p', '0', '+');
+        generator.addExpression(param1, 'p', '1', '+');
         // Acceder y guardar el valor
         const punteroHeap = generator.newTemporal();
         generator.addGetStack(punteroHeap, param1);
@@ -199,17 +234,7 @@ export class FuncionesNativas{
         const lblExit = generator.newLabel();
 
         // Comparar si es fin de cadena
-        generator.addIf(accesoHeap, '-1', '==', lblOperacion);
-        // Saltar a incremento de iterador
-        generator.addGoto(lblIncremento);
-        // Retornar el tamanio
-        generator.addLabel(lblOperacion);
-        // Generar temporal para acceder a posicion de return
-        const tempRet = generator.newTemporal();
-        generator.addExpression(tempRet, 'p', '2', '+');
-        generator.addSetStack(tempRet, iterator);
-        generator.addGoto(lblExit);
-
+        generator.addIf(accesoHeap, '-1', '==', lblExit);
         // Etiqueta Incremento
         generator.addLabel(lblIncremento);
         generator.addExpression(punteroHeap, punteroHeap, '1', '+');
@@ -217,6 +242,15 @@ export class FuncionesNativas{
         generator.addGoto(lblCiclo);
         // Imprimir salida
         generator.addLabel(lblExit);  
+        // Generar temporal para acceder a posicion de return
+        // Retornar el tamanio        
+        const tempRet = generator.newTemporal();
+        generator.addExpression(tempRet, 'p');
+        generator.addExpression(iterator, iterator, 1,'-');
+        generator.addSetStack(tempRet, iterator);      
+        
+        generator.returnMetodo();        
+        generator.finMetodo();              
     }
 
     public concat(){
@@ -241,12 +275,7 @@ export class FuncionesNativas{
         // Almacenar el puntero a heap antes de inicial
         const heapActual = generator.newTemporal();
         generator.addExpression(heapActual, 'h');
-    
-/*
-        // Generar etiqueta para simular for 
-        const lblCiclo = generator.newLabel();
-        generator.addLabel(lblCiclo);
-*/
+
         // Generar temporal para guardar el acceso a heap para primer string
         const accesoHeap = generator.newTemporal();
         // Generar temporal para guardar el acceso a heap para segundo string
@@ -628,7 +657,7 @@ return;
         const generator = Generator.getInstance();
 
         generator.inicioMetodo();   
-        generator.nombreMetodo("concat_str_bool");     
+        generator.nombreMetodo("concat_bool_str");     
 
         // Temporal para acceder al primer parametro (valor booleano)
         const param1 = generator.newTemporal();
@@ -676,7 +705,7 @@ return;
         generator.nextHeap();
         generator.addSetHeap('h', 101); // e
         generator.nextHeap();
-        generator.addGoto(lblExit);
+        generator.addGoto(lblStr1);
 
 
         generator.addLabel(lblFalse);
@@ -723,46 +752,3 @@ return;
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-// Acceder al valor inicial del string
-    t2 = Stack[(int)T0];
-// Buscar el valor en heap
-    L0:
-    t1 = Heap[(int)t2];
-    if(t1 == -1) goto L3;
-    if(t1<97) goto L2;
-    if(t1>122) goto L2;
-    
-    L1:
-    t1 = t1 -32;
-    L2:
-    printf("%c",(int)t1);
-    t2 = t2 + 1;
-    
-    goto L0;
-    L3:
-    return 0;
-    
-
-*/

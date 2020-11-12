@@ -1,51 +1,43 @@
-import { Instruccion } from "../../Abstract/Instruccion";
 import { Tipo, Tipos } from "../../Util/Tipo";
 import { Expresion } from "../../Abstract/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Generator } from "../../Generator/Generator";
 import { Error_ } from "../../Util/Error_";
 import { Retorno } from '../../Util/Retorno';
-import { FuncionesNativas } from '../../Generator/FuncionesNativas';
+import { AccesoArreglo } from '../../Expresion/Acceso/AccesoArreglo';
+import { AccesoType } from '../../Expresion/Acceso/AccesoType';
+import { Acceso } from '../../Expresion/Acceso/Acceso';
 
 
-export class UpperString extends Instruccion {
-    private id: string ;
+export class UpperString extends Expresion {
+    private id: Expresion;
 
-    constructor( id: string,  line: number, column: number) {
+    constructor( id: Expresion, line: number, column: number) {
         super(line, column);
         this.id = id;
     }
 
-    compile(env: Entorno): void {
+    compile(env: Entorno): Retorno {
         const generator = Generator.getInstance();
-        // Buscar variable en la tabla de simbolos        
-        const symbol = env.getVar(this.id);
-        if (symbol == null) 
-            throw new Error_(this.line, this.column, 'Semantico', `No existe la variable ${this.id}`);
-        const temporalAcceso = generator.newTemporal();
-        // Obtener inicio del string y guardarlo en stack
-        generator.addGetStack(temporalAcceso, symbol.position);
-        generator.addNextEnv(1);
+        const temporalAcceso = this.id.compile(env);
+        if(temporalAcceso == null || temporalAcceso == undefined)
+            throw new Error_(this.line, this.column, 'Semantico', ` Error al acceder`);
+        if(temporalAcceso.type.type != Tipos.STRING)
+            throw new Error_(this.line, this.column, 'Semantico', ` Funcion no aplicable a tipo ${temporalAcceso.type.type}`);            
+        generator.addNextEnv(env.size + 1);
         // Temporal para almacenar el nuevo valor de p
         const pTemp = generator.newTemporal();  
-        generator.addExpression(pTemp, 'p');      
+        generator.addExpression(pTemp, 'p',1,'+');      
         // Almacenar en el stack el inicio del string
-        generator.addSetStack(pTemp, temporalAcceso);
+        generator.addSetStack(pTemp, temporalAcceso.getValue());
         // Llamar a funcion upper
         generator.llamadaFuncion('ToUpperCase');
         // Devolver el puntero p a su valor original
-        generator.addAntEnv(1);
-
-        const nativa = new FuncionesNativas();
-        nativa.toUpper();        
-    }
-
-    private validateType(env: Entorno){
-     /*   if(this.type.type == Tipos.STRUCT){
-            const struct = enviorement.searchStruct(this.type.typeId);
-            if(!struct)
-                throw new Error(this.line,this.column,'Semantico',`No existe el struct ${this.type.typeId}`);
-            this.type.struct = struct;
-        }*/
+        const ret = generator.newTemporal();
+        generator.addExpression(ret, 'p');
+        const valor = generator.newTemporal();
+        generator.addGetStack(valor, ret);
+        generator.addAntEnv(env.size + 1);                      
+        return new Retorno(valor,true, new Tipo(Tipos.STRING));
     }
 }

@@ -6,69 +6,50 @@ import { Generator } from "../../Generator/Generator";
 import { Error_ } from "../../Util/Error_";
 import { Retorno } from '../../Util/Retorno';
 import { FuncionesNativas } from '../../Generator/FuncionesNativas';
+import { AccesoArreglo } from '../../Expresion/Acceso/AccesoArreglo';
+import { AccesoType } from '../../Expresion/Acceso/AccesoType';
+import { Acceso } from '../../Expresion/Acceso/Acceso';
 
 
-export class Concat extends Instruccion {
-    private id: string ;
+export class Concat extends Expresion {
+    private id: Acceso | AccesoArreglo | AccesoType;
     private str2 : Expresion;
 
-    constructor( id: string, str2:Expresion,  line: number, column: number) {
+    constructor( id: Acceso | AccesoArreglo | AccesoType, str2:Expresion,  line: number, column: number) {
         super(line, column);
         this.id = id;
         this.str2 = str2;
     }
 
-    compile(env: Entorno): void {
+    compile(env: Entorno): Retorno {
         const generator = Generator.getInstance();
-
-        // Buscar variable en la tabla de simbolos        
-        const symbol = env.getVar(this.id);
-        if (symbol == null) 
-            throw new Error_(this.line, this.column, 'Semantico', `No existe la variable ${this.id}`);        
-        const temporalAcceso = generator.newTemporal();
-        // Obtener el puntero al inicio del string ->0 t = stack[temp]
-        generator.addGetStack(temporalAcceso, symbol.position);
-
-        // Cambio de ambito
-        generator.addNextEnv(env.size);
+        const temporalAcceso = this.id.compile(env);
+        if(temporalAcceso == null || temporalAcceso == undefined)
+            throw new Error_(this.line, this.column, 'Semantico', ` Error al acceder`);
+        generator.addNextEnv(env.size + 1);
 
         //--- PASO DE PRIMER PARAMETRO ---
-        // Apuntar a la primera posicion del ambito
-        const temporalP1 = generator.newTemporal();
-        generator.addExpression(temporalP1, 'p'); 
-        // Pasar puntero a inicio como parametro
-        generator.addSetStack(temporalP1, temporalAcceso);
+        // Temporal para almacenar el nuevo valor de p
+        const pTemp = generator.newTemporal();  
+        generator.addExpression(pTemp, 'p',0,'+');      
+        // Almacenar en el stack el inicio del string
+        generator.addSetStack(pTemp, temporalAcceso.getValue());
 
         // --- PASO DE SEGUNDO PARAMETRO ---
-        const temporalP2 = generator.newTemporal();
-        generator.addExpression(temporalP2, 'p', '1', '+');
-        // Ejecutar segundo string
-        const stringConcat = this.str2.compile(env);
-        generator.addSetStack(temporalP2, stringConcat.getValue());
+        generator.addExpression(pTemp, pTemp, '1', '+');
+        // Ejecutar indice
+        const indice = this.str2.compile(env);
+        generator.addSetStack(pTemp, indice.getValue());
 
         // Llamar la funcion
-        generator.llamadaFuncion('concat');
+        generator.llamadaFuncion('concat_str_str');
+        // Devolver el puntero p a su valor original
+        const ret = generator.newTemporal();
+        generator.addExpression(ret, 'p', 2, '+');
+        const valor = generator.newTemporal();
+        generator.addGetStack(valor, ret);
+        generator.addAntEnv(env.size + 1);                      
+        return new Retorno(valor,true, new Tipo(Tipos.STRING));
 
-        const tempret = generator.newTemporal();
-        generator.addExpression(tempret, 'p', '2', '+');
-
-        const valret = generator.newTemporal();
-        generator.addExpression(valret , tempret);
-        // Retornar p a su ambito
-        generator.addAntEnv(env.size);
-
-
-        generator.addComment('Aqui empieza nativa xd');
-        const nativa = new FuncionesNativas();
-        nativa.concat();        
-    }
-
-    private validateType(env: Entorno){
-     /*   if(this.type.type == Tipos.STRUCT){
-            const struct = enviorement.searchStruct(this.type.typeId);
-            if(!struct)
-                throw new Error(this.line,this.column,'Semantico',`No existe el struct ${this.type.typeId}`);
-            this.type.struct = struct;
-        }*/
     }
 }
