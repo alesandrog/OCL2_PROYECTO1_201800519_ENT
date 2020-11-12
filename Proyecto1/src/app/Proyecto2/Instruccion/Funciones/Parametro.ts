@@ -1,9 +1,7 @@
 import { Instruccion } from "../../Abstract/Instruccion";
 import { Tipo, Tipos } from "../../Util/Tipo";
-import { Expresion } from "../../Abstract/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Generator } from "../../Generator/Generator";
-import { Error_ } from "../../Util/Error_";
+
 
 export class Parametro extends Instruccion{
     
