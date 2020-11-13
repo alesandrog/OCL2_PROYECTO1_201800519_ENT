@@ -4,7 +4,8 @@ import { Expresion } from "../../Abstract/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Generator } from "../../Generator/Generator";
 import { Error_ } from "../../Util/Error_";
-
+import { tablaSimbolos } from "../../TablaSimbolos/TablaSimbolos";
+import { SimboloReporte } from "../../TablaSimbolos/SimboloReporte";
 export class Declaracion extends Instruccion {
     private type: Tipo;
     private id: string;
@@ -22,6 +23,11 @@ export class Declaracion extends Instruccion {
         const generator = Generator.getInstance();
         if(this.value == null){
             const newVar = env.addVar(this.id, this.type, false,false);
+            let ref = false;
+            if(this.type.type == Tipos.ARRAY || this.type.type == Tipos.TYPE || this.type.type == Tipos.STRING)
+                ref = true;            
+            const reporte = new SimboloReporte(this.id, Tipos[this.type.type], newVar.position, this.dimension, Tipos[this.type.subTipo], env.prop, ref);
+            tablaSimbolos.push(reporte);
             if(!newVar) throw new Error_(this.line,this.column,'Semantico',`La variable: ${this.id} ya existe en este ambito`);
         
 
@@ -58,16 +64,15 @@ export class Declaracion extends Instruccion {
 
         // Si no esta inicializada, guardar el tipo con el que fue declarada
         // Retorna false si ya existe la variable en el entorno
-        /*
-        
- let a : number[] = [1,2,3];
-console.log(a[0]);       
-        */
- 
 
         const newVar = env.addVar(this.id, this.type, false,false);
             if(!newVar) throw new Error_(this.line,this.column,'Semantico',`La variable: ${this.id} ya existe en este ambito`);
         
+        let ref = false;
+        if(this.type.type == Tipos.ARRAY || this.type.type == Tipos.TYPE || this.type.type == Tipos.STRING)
+            ref = true;            
+        const reporte = new SimboloReporte(this.id, this.type.type, newVar.position, this.dimension, this.type.subTipo, env.prop, ref);
+        tablaSimbolos.push(reporte);            
 
             if(newVar.isGlobal){
                 if(this.type.type == Tipos.BOOLEAN){

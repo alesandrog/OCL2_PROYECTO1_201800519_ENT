@@ -5,6 +5,8 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Generator } from "../../Generator/Generator";
 import { Parametro } from "./Parametro";
 import { Error_ } from "../../Util/Error_";
+import { SimboloReporte } from '../../TablaSimbolos/SimboloReporte';
+import { tablaSimbolos } from '../../TablaSimbolos/TablaSimbolos';
 
 export class Funcion extends Instruccion {
     private banderaPasada : boolean = false;
@@ -30,7 +32,10 @@ export class Funcion extends Instruccion {
             // Almacenar la funcion en el entorno
             if(!env.guardarFuncion(this, this.id))
                 throw new Error_(this.line,this.column,'Semantico',`Ya existe una funcion con el id: ${this.id}`);
-            this.banderaPasada = true;                
+            this.banderaPasada = true;      
+            const reporte = new SimboloReporte(this.id, this.retorno.type, 0, 0, "", env.prop, false);
+            reporte.funcion = true;
+            tablaSimbolos.push(reporte);                        
             return;            
         }
         const funcion = env.getFuncion(this.id);
