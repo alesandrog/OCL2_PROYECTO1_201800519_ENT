@@ -405,16 +405,16 @@ export class FuncionesNativas{
 
         let conversion = `
 void number_to_string(){
-int param1 = p + 0;    
-int iterador = 0;
-int asciiNumero = 0;    
-char ascii;
-int bandera = 0;        
-double numero = Stack[param1];
-double copia = numero;
-int copia2 = (int)copia;
-double verificacion = numero - copia2;
-double vdecimales = 0;
+param1 = p + 0;    
+iterador = 0;
+asciiNumero = 0;    
+ascii = 0;
+bandera = 0;        
+numero = Stack[param1];
+copia = numero;
+copia2 = (int)copia;
+verificacion = numero - copia2;
+vdecimales = 0;
 if(verificacion == 0 ) goto CONTINUAR2;
 if(copia < 0) goto NEGAR;
 vdecimales = verificacion;
@@ -432,7 +432,7 @@ numero = 0 - numero;
 CONVERTIR_ENTERO:
 if(numero < 1) goto FIN;
 asciiNumero = fmod(numero , 10);
-asciiNumero = asciiNumero + '0';
+asciiNumero = asciiNumero + 48;
 numero = numero / 10;    
 enteros[iterador] = asciiNumero;    
 iterador= iterador + 1;
@@ -442,10 +442,10 @@ FIN:
 iterador = iterador - 1;
 if(bandera == 0) goto CICLOPRINT;
 iterador = iterador + 1;
-enteros[iterador] = '-';
+enteros[iterador] = 45;
 iterador = iterador + 1;
     
-      
+        
 CICLOPRINT:
 if(iterador < 0) goto DECIMAL;
 ascii = enteros[iterador];
@@ -453,25 +453,25 @@ Heap[h] = ascii;
 h = h + 1;
 iterador = iterador - 1;
 goto CICLOPRINT;
-      
+        
 DECIMAL:
 iterador = 0;
 if(vdecimales == 0) goto SALIR;
 CONVERTIR_DECIMAL:
 if(vdecimales < 1) goto FIN2;
 asciiNumero = fmod(vdecimales , 10);
-asciiNumero = asciiNumero + '0';
+asciiNumero = asciiNumero + 48;
 vdecimales = vdecimales / 10;    
 decimales[iterador] = asciiNumero;    
 iterador= iterador + 1;
 goto CONVERTIR_DECIMAL;
         
 FIN2:
-decimales[iterador] = '.';
+decimales[iterador] = 46;
 iterador = iterador + 1;
 iterador = iterador - 1;
         
-      
+        
 CICLOPRINT2:
 if(iterador < 0) goto SALIR;
 ascii = decimales[iterador];
