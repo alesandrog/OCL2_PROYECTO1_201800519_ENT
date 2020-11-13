@@ -20,8 +20,8 @@ export class Modulo extends Expresion {
         const right = this.right.compile(env);
         const generator = Generator.getInstance();
         const temp = generator.newTemporal();
-        if(left.type.type == Tipos.NUMBER && right.type.type){
-            generator.addExpression(temp, left.getValue(), right.getValue(), '%');
+        if(left.type.type == Tipos.NUMBER && right.type.type == Tipos.NUMBER){
+            generator.addExpressionModulo(temp, left.getValue(), right.getValue(), '%');
             return new Retorno(temp, true, new Tipo(Tipos.NUMBER));            
         }        
         throw new Error_(this.line, this.column, 'Semantico', ` Modulo no operable: ${left.type.type} % ${right.type.type}`);
